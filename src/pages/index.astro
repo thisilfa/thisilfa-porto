@@ -1,20 +1,46 @@
 ---
-// Token showcase — scaffold placeholder. Replaced by the real Home page in U8;
-// exists so design tokens (U4) are reviewable in the PR.
+// Home — design.md's six sections, English. Indonesian mirror: id/index.astro.
+import { getCollection } from 'astro:content';
 import Base from '../layouts/base.astro';
+import ProjectCard from '../components/project-card.astro';
+import { t } from '../i18n/ui';
+import { entrySlug, getByLocale, sortProjects } from '../lib/content';
+import { withBase } from '../lib/urls';
+
+const lang = 'en' as const;
+
+const allProjects = await getCollection('projects');
+const featured = sortProjects(getByLocale(allProjects, lang).filter((e) => e.data.featured));
+
+const expertise = [
+  { area: 'Programming', tech: ['Python', 'SQL'] },
+  { area: 'Computer Vision', tech: ['OpenCV', 'YOLO', 'SAM'] },
+  { area: 'Machine Learning', tech: ['PyTorch', 'Scikit-learn'] },
+  { area: 'AI & LLM', tech: ['RAG', 'ChromaDB', 'DINOv2', 'CLIP'] },
+  { area: 'Backend', tech: ['FastAPI', 'Flask'] },
+  { area: 'Database & Search', tech: ['PostgreSQL', 'pgvector', 'FAISS', 'Redis'] },
+  { area: 'Deployment', tech: ['Docker', 'ONNX', 'Linux', 'Raspberry Pi'] },
+  { area: 'Automation', tech: ['n8n'] },
+];
+
+const journey = [
+  { place: 'Quick Tractor', role: 'Junior ML / Data Engineer' },
+  { place: 'Biologic Technik', role: 'Computer Vision Engineer' },
+  { place: 'Independent projects', role: 'Technical experiments and personal lab work' },
+];
 ---
 
 <Base
-  lang="en"
-  title="Silfaradila Mei Fizahidah — token showcase"
-  description="Design-system sample page while the portfolio is under construction."
+  lang={lang}
+  title={`${t(lang, 'site.name')} — ${t(lang, 'site.role')}`}
+  description={t(lang, 'site.tagline')}
 >
   <section class="texture-grid hero">
-    <p class="kicker mono">U4 · DESIGN TOKENS</p>
+    <p class="kicker mono">{t(lang, 'site.role')}</p>
     <h1>Building intelligent systems through practical engineering.</h1>
     <p class="lede">
-      Sample of the design system: display type, body copy at AA contrast, neon accents reserved for
-      interactive elements.
+      I'm an AI Engineer focused on developing practical AI solutions — from machine learning models
+      and computer vision pipelines to backend systems and intelligent applications.
     </p>
     <div class="chips">
       <span class="chip mono">Computer Vision</span>
@@ -22,24 +48,88 @@ import Base from '../layouts/base.astro';
       <span class="chip mono">LLM &amp; RAG</span>
       <span class="chip mono">Backend Engineering</span>
     </div>
+    <p class="available">
+      <span class="dot" aria-hidden="true"></span>
+      {t(lang, 'home.available')}
+    </p>
+    <div class="ctas">
+      <a class="cta" href={withBase('/projects/')}>
+        {t(lang, 'home.exploreProjects')}
+      </a>
+      <a class="cta quiet" href={withBase('/downloads/silfaradila-mei-resume-en.pdf')} download>
+        {t(lang, 'home.downloadResume')}
+      </a>
+      <a class="cta quiet" href={withBase('/contact/')}>
+        {t(lang, 'home.contactCta')}
+      </a>
+    </div>
   </section>
-  <section class="wrap">
-    <div class="card">
-      <h2>Card surface (—surface-1)</h2>
-      <p>
-        Body copy sits here. <a href="#">This is a link</a> in neon magenta; focus it with the
-        keyboard to see the focus ring, hover it to see the state shift.
-      </p>
-      <button class="cta">Primary CTA</button>
-      <button>Quiet button</button>
+
+  <section class="section">
+    <h2>Engineering in practice</h2>
+    <p class="lede">
+      My work spans the engineering lifecycle: understanding the problem, experimenting with models,
+      designing pipelines, building APIs, and integrating solutions into larger systems — computer
+      vision on edge devices, retrieval-augmented LLM applications, and the backend infrastructure
+      that makes them dependable.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2>{t(lang, 'home.featured')}</h2>
+    <div class="grid">
+      {featured.length === 0 && <p class="empty">{t(lang, 'home.featuredEmpty')}</p>}
+      {featured.map((entry) => (
+        <ProjectCard entry={{ slug: entrySlug(entry.id), data: entry.data }} />
+      ))}
     </div>
-    <div class="card glow-violet">
-      <h2>Same card, glow effect</h2>
-      <p>
-        The glow is a single token (--glow-violet), applied only to accent moments. The grid texture
-        above fades out radially — both effects are static and honor prefers-reduced-motion.
-      </p>
+  </section>
+
+  <section class="section">
+    <h2>{t(lang, 'home.expertise')}</h2>
+    <div class="expertise-table">
+      <table>
+        <tbody>
+          {expertise.map((group) => (
+            <tr>
+              <th scope="row">{group.area}</th>
+              <td>{group.tech.join(' · ')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
+    <div class="expertise-list">
+      {expertise.map((group) => (
+        <div class="expertise-group">
+          <p class="mono area">{group.area}</p>
+          <div class="tech">
+            {group.tech.map((item) => (
+              <span class="chip mono">{item}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>{t(lang, 'home.journey')}</h2>
+    <ol class="timeline">
+      {journey.map((step) => (
+        <li>
+          <p class="place">{step.place}</p>
+          <p class="role">{step.role}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="section closing">
+    <h2>Have an interesting problem to solve or a project to discuss?</h2>
+    <a class="cta" href={withBase('/contact/')}>
+      {t(lang, 'home.contactCta')}
+    </a>
   </section>
 </Base>
 
@@ -64,7 +154,7 @@ import Base from '../layouts/base.astro';
 
   .lede {
     margin-top: var(--space-4);
-    max-width: 52ch;
+    max-width: 56ch;
     font-size: var(--text-lg);
   }
 
@@ -83,26 +173,28 @@ import Base from '../layouts/base.astro';
     padding: var(--space-1) var(--space-3);
   }
 
-  .wrap {
-    max-width: var(--container);
-    margin: 0 auto;
-    padding: 0 var(--container-pad) var(--space-9);
-    display: grid;
-    gap: var(--space-5);
+  .available {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    color: var(--neon-cyan);
+    font-size: var(--text-sm);
   }
 
-  .card {
-    background: var(--surface-1);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: var(--space-6);
-    display: grid;
-    gap: var(--space-4);
-    justify-items: start;
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--neon-cyan);
+    box-shadow: 0 0 8px rgba(76, 201, 240, 0.8);
   }
 
-  .card h2 {
-    font-size: var(--text-2xl);
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
   }
 
   .cta {
@@ -112,6 +204,7 @@ import Base from '../layouts/base.astro';
     background: var(--neon-magenta);
     border-radius: var(--radius-pill);
     padding: var(--space-2) var(--space-5);
+    text-decoration: none;
     transition:
       box-shadow var(--transition-fast),
       transform var(--transition-fast);
@@ -122,7 +215,149 @@ import Base from '../layouts/base.astro';
     transform: translateY(-1px);
   }
 
-  button:not(.cta):hover {
-    color: var(--neon-magenta);
+  .cta.quiet {
+    color: var(--text-body);
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+  }
+
+  .cta.quiet:hover {
+    color: var(--text-high);
+    box-shadow: var(--glow-violet);
+  }
+
+  .section {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-8) var(--container-pad) 0;
+  }
+
+  .section h2 {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-5);
+  }
+
+  .empty {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 760px) {
+    .grid {
+      grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    }
+  }
+
+  /* Expertise: full table on wide viewports, stacked groups on small ones. */
+  .expertise-list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .expertise-group .area {
+    color: var(--neon-violet);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+  }
+
+  .expertise-group .tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .expertise-table {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .expertise-list {
+      display: none;
+    }
+
+    .expertise-table {
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: var(--text-sm);
+    }
+
+    th {
+      color: var(--text-high);
+      font-family: var(--font-display);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    td {
+      color: var(--text-body);
+    }
+  }
+
+  .timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-5);
+    position: relative;
+  }
+
+  .timeline li {
+    border-left: 2px solid var(--border-subtle);
+    padding-left: var(--space-5);
+    position: relative;
+  }
+
+  .timeline li::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 0.35rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--neon-magenta);
+    box-shadow: var(--glow-magenta);
+  }
+
+  .place {
+    color: var(--text-high);
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
+
+  .role {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .closing {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+    padding-bottom: var(--space-9);
+  }
+
+  .closing h2 {
+    font-size: var(--text-2xl);
+    max-width: 30ch;
   }
 </style>

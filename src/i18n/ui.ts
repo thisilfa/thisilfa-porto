@@ -45,6 +45,17 @@ const en = {
 
   'a11y.skipToContent': 'Skip to content',
 
+  'home.available': 'Available for opportunities',
+  'home.exploreProjects': 'Explore Projects',
+  'home.downloadResume': 'Download Resume',
+  'home.contactCta': 'Contact Me',
+  'home.featured': 'Featured Projects',
+  'home.featuredEmpty': 'Case studies are being written right now — check back shortly.',
+  'home.expertise': 'Technical Expertise',
+  'home.journey': 'Professional Journey',
+  'resume.download': 'Download Resume (PDF)',
+  'resume.englishOnly': 'The resume is currently available in English.',
+
   'notfound.title': 'Page not found',
   'notfound.body': 'The page you are looking for does not exist or has moved.',
   'notfound.home.en': 'Continue in English',
@@ -66,6 +77,17 @@ const id: Record<keyof typeof en, string> = {
   'footer.backHome': 'Kembali ke beranda',
 
   'a11y.skipToContent': 'Langsung ke konten',
+
+  'home.available': 'Terbuka untuk peluang',
+  'home.exploreProjects': 'Lihat Proyek',
+  'home.downloadResume': 'Unduh Resume',
+  'home.contactCta': 'Hubungi Saya',
+  'home.featured': 'Proyek Unggulan',
+  'home.featuredEmpty': 'Studi kasus sedang ditulis — mohon kembali sebentar lagi.',
+  'home.expertise': 'Keahlian Teknis',
+  'home.journey': 'Perjalanan Profesional',
+  'resume.download': 'Unduh Resume (PDF)',
+  'resume.englishOnly': 'Resume saat ini tersedia dalam bahasa Inggris.',
 
   'notfound.title': 'Halaman tidak ditemukan',
   'notfound.body': 'Halaman yang Anda cari tidak ada atau telah dipindahkan.',

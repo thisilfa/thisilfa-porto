@@ -1,0 +1,144 @@
+---
+/** Featured project card: title, category + status, overview, stack chips,
+ * disclosure + ownership line, and a link to the case study. Data comes from
+ * the projects collection (schema fields in src/lib/project-schema.ts). */
+import { withBase } from '../lib/urls';
+
+export interface CardEntry {
+  slug: string;
+  data: {
+    title: string;
+    category: string;
+    overview: string;
+    stack: string[];
+    statusKind: 'delivered' | 'staging' | 'research' | 'unverified';
+    ownership: 'employer' | 'independent' | 'unconfirmed';
+    disclosure: string;
+    kind: 'case-study' | 'compact';
+  };
+}
+
+interface Props {
+  entry: CardEntry;
+}
+
+const { entry } = Astro.props;
+const href = withBase(`/projects/${entry.slug}/`);
+---
+
+<article class="card">
+  <header>
+    <h3>
+      <a href={href}>{entry.data.title}</a>
+    </h3>
+    <p class="meta mono">
+      <span class="category">{entry.data.category}</span>
+      <span class="status status-{entry.data.statusKind}">{entry.data.statusKind}</span>
+    </p>
+  </header>
+  <p class="overview">{entry.data.overview}</p>
+  <ul class="stack">
+    {entry.data.stack.map((tech) => (
+      <li class="mono">{tech}</li>
+    ))}
+  </ul>
+  <p class="disclosure">{entry.data.disclosure}</p>
+</article>
+
+<style>
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+    transition:
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast);
+  }
+
+  .card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--glow-violet);
+  }
+
+  h3 {
+    font-size: var(--text-xl);
+  }
+
+  h3 a {
+    color: var(--text-high);
+    text-decoration: none;
+  }
+
+  h3 a:hover {
+    color: var(--neon-magenta);
+  }
+
+  .meta {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    font-size: var(--text-xs);
+    margin-top: var(--space-2);
+  }
+
+  .category {
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .status {
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-subtle);
+    padding: 0 var(--space-2);
+  }
+
+  .status-delivered {
+    color: var(--neon-cyan);
+    border-color: rgba(76, 201, 240, 0.45);
+  }
+
+  .status-staging {
+    color: var(--neon-violet);
+    border-color: rgba(157, 107, 255, 0.45);
+  }
+
+  .status-research,
+  .status-unverified {
+    color: var(--neon-pumpkin);
+    border-color: rgba(255, 171, 94, 0.45);
+  }
+
+  .overview {
+    font-size: var(--text-sm);
+    max-width: 60ch;
+  }
+
+  .stack {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .stack li {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-pill);
+    padding: 0 var(--space-2);
+  }
+
+  .disclosure {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-subtle);
+    padding-top: var(--space-3);
+  }
+</style>

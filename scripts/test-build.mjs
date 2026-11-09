@@ -1,7 +1,7 @@
 // Build-output smoke checks, run after `astro build` (npm run test:build).
 // Grows with the site: U6 adds sitemap/hreflang checks, U5 adds nav assertions,
 // U8 adds the education-content ban.
-import { access, readFile } from 'node:fs/promises';
+import { access, readdir, readFile } from 'node:fs/promises';
 
 const dist = new URL('../dist/', import.meta.url);
 
@@ -106,6 +106,88 @@ for (const marker of [
   if (!nf.includes(marker)) {
     console.error(`test:build — 404.html is missing: ${marker}`);
     process.exit(1);
+  }
+}
+
+// AE3, site-wide: education content lives only in the downloadable PDF.
+// Scan every built HTML file for education terms.
+const educationTerms =
+  /universit|bachelor|master of|b\.?sc|m\.?sc|gelar|sarjana|\bIPK\b|\bGPA\b|coursework|transcript|thesis|skripsi/i;
+async function* htmlFiles(dir) {
+  for (const name of await readdir(dir, { withFileTypes: true })) {
+    const child = new URL(name.name + (name.isDirectory() ? '/' : ''), dir);
+    if (name.isDirectory()) yield* htmlFiles(child);
+    else if (name.name.endsWith('.html')) yield child;
+  }
+}
+for await (const file of htmlFiles(dist)) {
+  const html = await readFile(file, 'utf8');
+  if (educationTerms.test(html)) {
+    console.error(`test:build — education term found in ${file.pathname.split('/dist/')[1]} (AE3)`);
+    process.exit(1);
+  }
+}
+
+// U8: home sections and hero CTA targets, both locales.
+const homes = [
+  {
+    file: 'index.html',
+    markers: [
+      'Building intelligent systems through practical engineering',
+      'Featured Projects',
+      'Technical Expertise',
+      'Professional Journey',
+      'href="/thisilfa-porto/projects/"',
+      'href="/thisilfa-porto/contact/"',
+      'href="/thisilfa-porto/downloads/silfaradila-mei-resume-en.pdf"',
+    ],
+  },
+  {
+    file: 'id/index.html',
+    markers: [
+      'Membangun sistem cerdas melalui rekayasa yang praktis',
+      'Proyek Unggulan',
+      'Keahlian Teknis',
+      'Perjalanan Profesional',
+      'href="/thisilfa-porto/id/projects/"',
+      'href="/thisilfa-porto/id/contact/"',
+      'href="/thisilfa-porto/downloads/silfaradila-mei-resume-en.pdf"',
+    ],
+  },
+];
+for (const home of homes) {
+  const url = new URL(home.file, dist);
+  if (!(await exists(url))) {
+    console.error(`test:build — dist/${home.file} missing`);
+    process.exit(1);
+  }
+  const html = await readFile(url, 'utf8');
+  for (const marker of home.markers) {
+    if (!html.includes(marker)) {
+      console.error(`test:build — ${home.file} is missing: ${marker}`);
+      process.exit(1);
+    }
+  }
+}
+
+// U8: contact pages carry the real details (origin R10), both locales.
+for (const contactFile of ['contact.html', 'id/contact.html']) {
+  const url = new URL(contactFile.replace(/\.html$/, '/index.html'), dist);
+  if (!(await exists(url))) {
+    console.error(`test:build — dist/${contactFile} missing`);
+    process.exit(1);
+  }
+  const html = await readFile(url, 'utf8');
+  for (const marker of [
+    'silfaradilamei@gmail.com',
+    'linkedin.com/in/silfaradila',
+    'github.com/thisilfa',
+    'Yogyakarta, Indonesia',
+  ]) {
+    if (!html.includes(marker)) {
+      console.error(`test:build — ${contactFile} is missing: ${marker}`);
+      process.exit(1);
+    }
   }
 }
 
