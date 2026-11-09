@@ -1,0 +1,149 @@
+---
+// Kontak — mirror Indonesia (R10).
+import Base from '../../layouts/base.astro';
+import { t } from '../../i18n/ui';
+import { withBase } from '../../lib/urls';
+
+const lang = 'id' as const;
+
+const channels = [
+  { label: 'Lokasi', value: 'Yogyakarta, Indonesia', href: null },
+  { label: 'Email', value: 'silfaradilamei@gmail.com', href: 'mailto:silfaradilamei@gmail.com' },
+  {
+    label: 'LinkedIn',
+    value: 'linkedin.com/in/silfaradila',
+    href: 'https://www.linkedin.com/in/silfaradila/',
+  },
+  { label: 'GitHub', value: 'github.com/thisilfa', href: 'https://github.com/thisilfa' },
+];
+---
+
+<Base
+  lang={lang}
+  title={`${t(lang, 'site.name')} — ${t(lang, 'nav.contact')}`}
+  description="Saya terbuka untuk peluang, kolaborasi teknis, dan percakapan seputar AI engineering, computer vision, dan sistem cerdas."
+>
+  <section class="contact texture-grid">
+    <p class="kicker mono">{t(lang, 'nav.contact')}</p>
+    <h1>Mari membangun sesuatu yang bermakna.</h1>
+    <p class="lede">
+      Saya terbuka untuk peluang, kolaborasi teknis, dan percakapan seputar AI engineering, computer
+      vision, dan sistem cerdas.
+    </p>
+    <div class="channels">
+      {channels.map((channel) => (
+        <div class="channel">
+          <p class="mono label">{channel.label}</p>
+          {channel.href ? (
+            <a
+              href={channel.href}
+              rel={channel.href.startsWith('http') ? 'me noopener' : undefined}
+            >
+              {channel.value}
+            </a>
+          ) : (
+            <p class="value">{channel.value}</p>
+          )}
+        </div>
+      ))}
+    </div>
+    <div class="resume">
+      <a class="cta" href={withBase('/downloads/silfaradila-mei-resume-en.pdf')} download>
+        {t(lang, 'resume.download')}
+      </a>
+      <p class="note">{t(lang, 'resume.englishOnly')}</p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .contact {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-9) var(--container-pad) var(--space-9);
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .kicker {
+    color: var(--neon-magenta);
+    font-size: var(--text-xs);
+    letter-spacing: 0.18em;
+  }
+
+  h1 {
+    font-size: var(--text-4xl);
+    max-width: 24ch;
+  }
+
+  .lede {
+    max-width: 56ch;
+    font-size: var(--text-lg);
+  }
+
+  .channels {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+    width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .channels {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .channel {
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .label {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+  }
+
+  .channel a,
+  .value {
+    color: var(--text-high);
+    font-size: var(--text-base);
+    text-decoration: none;
+  }
+
+  .channel a:hover {
+    color: var(--neon-magenta);
+  }
+
+  .resume {
+    margin-top: var(--space-3);
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .note {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .cta {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--surface-0);
+    background: var(--neon-magenta);
+    border-radius: var(--radius-pill);
+    padding: var(--space-2) var(--space-5);
+    text-decoration: none;
+    transition: box-shadow var(--transition-fast);
+  }
+
+  .cta:hover {
+    box-shadow: var(--glow-magenta);
+  }
+</style>

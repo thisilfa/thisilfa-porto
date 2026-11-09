@@ -1,0 +1,273 @@
+---
+// Tentang — mirror Indonesia. Pendidikan hanya ada di PDF yang diunduh (AE3).
+import { Image } from 'astro:assets';
+import Base from '../../layouts/base.astro';
+import { t } from '../../i18n/ui';
+import { withBase } from '../../lib/urls';
+import portrait from '../../assets/profile/neon-cat-lounge.png';
+
+const lang = 'id' as const;
+
+const interests = [
+  'Computer Vision dan kecerdasan visual',
+  'Machine Learning dan deteksi anomali',
+  'Aplikasi LLM dan Retrieval-Augmented Generation',
+  'Arsitektur sistem AI',
+  'Edge AI dan optimasi model',
+  'Otomasi cerdas',
+];
+
+const philosophy = [
+  {
+    name: 'Masalah sebelum teknologi',
+    body: 'Pahami masalahnya sebelum memilih model atau framework.',
+  },
+  { name: 'Eksperimen di atas asumsi', body: 'Validasi keputusan teknis melalui eksperimen.' },
+  { name: 'Berpikir end-to-end', body: 'Pertimbangkan sistem secara utuh, bukan hanya modelnya.' },
+  {
+    name: 'Rekayasa yang praktis',
+    body: 'Utamakan keandalan, kemudahan perawatan, dan hasil yang terukur.',
+  },
+];
+
+const experience = [
+  {
+    place: 'Biologic Technik',
+    role: 'Computer Vision Engineer',
+    note: 'Sistem vision inventaris rumah sakit, identifikasi instrumen bedah, intelijen pasar berbasis LLM.',
+  },
+  {
+    place: 'Quick Tractor',
+    role: 'Junior ML / Data Engineer',
+    note: 'Deteksi keselamatan kerja, presensi wajah, pencarian produk visual.',
+  },
+];
+---
+
+<Base
+  lang={lang}
+  title={`${t(lang, 'site.name')} — ${t(lang, 'nav.about')}`}
+  description="AI Engineer dengan pengalaman langsung mengembangkan dan mengintegrasikan solusi machine learning ke aplikasi praktis."
+>
+  <section class="about texture-grid">
+    <div class="portrait">
+      <Image
+        src={portrait}
+        alt="Potret ilustratif Silfaradila di meja berneon bersama kucingnya, dalam palet cyberpunk magenta-ungu khas situs ini"
+        width={600}
+        loading="eager"
+      />
+    </div>
+    <div class="story">
+      <p class="kicker mono">{t(lang, 'nav.about')}</p>
+      <h1>AI Engineer, dari hulu ke hilir.</h1>
+      <p class="lede">
+        Saya AI Engineer dengan pengalaman langsung mengembangkan dan mengintegrasikan solusi
+        machine learning ke dalam aplikasi praktis.
+      </p>
+      <p>
+        Pekerjaan saya mencakup computer vision, machine learning, pengembangan backend, dan sistem
+        berbasis LLM. Saya menikmati bekerja di seluruh siklus rekayasa — dari memahami masalah dan
+        bereksperimen dengan model hingga merancang pipeline, membangun API, dan mengintegrasikan
+        solusi ke sistem yang lebih besar.
+      </p>
+      <p>
+        Saya tertarik membangun aplikasi AI yang andal, skalabel, dan praktis untuk tantangan dunia
+        nyata.
+      </p>
+      <a class="cta" href={withBase('/id/contact/')}>
+        {t(lang, 'home.contactCta')}
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Area ketertarikan</h2>
+    <ul class="interests">
+      {interests.map((item) => (
+        <li>{item}</li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>Filosofi rekayasa</h2>
+    <div class="principles">
+      {philosophy.map((principle) => (
+        <div class="principle">
+          <p class="mono name">{principle.name}</p>
+          <p>{principle.body}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Pengalaman profesional</h2>
+    <div class="experience">
+      {experience.map((role) => (
+        <div class="role-card">
+          <p class="place">{role.place}</p>
+          <p class="title">{role.role}</p>
+          <p class="note">{role.note}</p>
+          <a href={withBase('/id/projects/')}>{t(lang, 'home.exploreProjects')} →</a>
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .about {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-9) var(--container-pad) var(--space-7);
+    display: grid;
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  @media (min-width: 760px) {
+    .about {
+      grid-template-columns: minmax(16rem, 22rem) 1fr;
+    }
+  }
+
+  .portrait :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--glow-violet);
+  }
+
+  .kicker {
+    color: var(--neon-magenta);
+    font-size: var(--text-xs);
+    letter-spacing: 0.18em;
+    margin-bottom: var(--space-3);
+  }
+
+  .story h1 {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .story p {
+    max-width: 60ch;
+    margin-top: var(--space-3);
+  }
+
+  .lede {
+    font-size: var(--text-lg);
+    color: var(--text-high);
+  }
+
+  .story .cta {
+    display: inline-block;
+    margin-top: var(--space-5);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--surface-0);
+    background: var(--neon-magenta);
+    border-radius: var(--radius-pill);
+    padding: var(--space-2) var(--space-5);
+    text-decoration: none;
+  }
+
+  .story .cta:hover {
+    box-shadow: var(--glow-magenta);
+  }
+
+  .section {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-7) var(--container-pad) 0;
+  }
+
+  .section h2 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-5);
+  }
+
+  .interests {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .interests li {
+    border-left: 2px solid var(--neon-violet);
+    padding-left: var(--space-4);
+    color: var(--text-body);
+  }
+
+  .principles {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .principles {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .principle {
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .principle .name {
+    color: var(--neon-violet);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+  }
+
+  .principle p:last-child {
+    font-size: var(--text-sm);
+    color: var(--text-body);
+  }
+
+  .experience {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .role-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-5);
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .place {
+    color: var(--text-high);
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
+
+  .title {
+    color: var(--neon-magenta);
+    font-size: var(--text-sm);
+  }
+
+  .note {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    max-width: 68ch;
+  }
+
+  .role-card a {
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+</style>

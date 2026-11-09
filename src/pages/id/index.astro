@@ -1,17 +1,135 @@
 ---
-// Placeholder halaman beranda Indonesia — digantikan halaman sesungguhnya di U8.
+// Beranda — mirror Indonesia dari design.md. English: /src/pages/index.astro.
+import { getCollection } from 'astro:content';
 import Base from '../../layouts/base.astro';
+import ProjectCard from '../../components/project-card.astro';
 import { t } from '../../i18n/ui';
+import { entrySlug, getByLocale, sortProjects } from '../../lib/content';
+import { withBase } from '../../lib/urls';
+
+const lang = 'id' as const;
+
+const allProjects = await getCollection('projects');
+const featured = sortProjects(getByLocale(allProjects, lang).filter((e) => e.data.featured));
+
+const expertise = [
+  { area: 'Pemrograman', tech: ['Python', 'SQL'] },
+  { area: 'Computer Vision', tech: ['OpenCV', 'YOLO', 'SAM'] },
+  { area: 'Machine Learning', tech: ['PyTorch', 'Scikit-learn'] },
+  { area: 'AI & LLM', tech: ['RAG', 'ChromaDB', 'DINOv2', 'CLIP'] },
+  { area: 'Backend', tech: ['FastAPI', 'Flask'] },
+  { area: 'Database & Pencarian', tech: ['PostgreSQL', 'pgvector', 'FAISS', 'Redis'] },
+  { area: 'Deployment', tech: ['Docker', 'ONNX', 'Linux', 'Raspberry Pi'] },
+  { area: 'Otomasi', tech: ['n8n'] },
+];
+
+const journey = [
+  { place: 'Quick Tractor', role: 'Junior ML / Data Engineer' },
+  { place: 'Biologic Technik', role: 'Computer Vision Engineer' },
+  { place: 'Proyek independen', role: 'Eksperimen teknis dan lab pribadi' },
+];
 ---
 
-<Base lang="id" title={`${t('id', 'site.name')} — Beranda`} description={t('id', 'site.tagline')}>
+<Base
+  lang={lang}
+  title={`${t(lang, 'site.name')} — ${t(lang, 'site.role')}`}
+  description={t(lang, 'site.tagline')}
+>
   <section class="texture-grid hero">
-    <p class="kicker mono">U6 · PLACEHOLDER /ID/</p>
-    <h1>{t('id', 'site.tagline')}</h1>
+    <p class="kicker mono">{t(lang, 'site.role')}</p>
+    <h1>Membangun sistem cerdas melalui rekayasa yang praktis.</h1>
     <p class="lede">
-      Halaman beranda Indonesia. Struktur lengkap menyusul di U8 — untuk saat ini halaman ini
-      menjadi target pergantian bahasa dan membuktikan routing /id/ berfungsi.
+      Saya AI Engineer yang fokus mengembangkan solusi AI praktis — dari model machine learning dan
+      pipeline computer vision hingga sistem backend dan aplikasi cerdas.
     </p>
+    <div class="chips">
+      <span class="chip mono">Computer Vision</span>
+      <span class="chip mono">Machine Learning</span>
+      <span class="chip mono">LLM &amp; RAG</span>
+      <span class="chip mono">Backend Engineering</span>
+    </div>
+    <p class="available">
+      <span class="dot" aria-hidden="true"></span>
+      {t(lang, 'home.available')}
+    </p>
+    <div class="ctas">
+      <a class="cta" href={withBase('/id/projects/')}>
+        {t(lang, 'home.exploreProjects')}
+      </a>
+      <a class="cta quiet" href={withBase('/downloads/silfaradila-mei-resume-en.pdf')} download>
+        {t(lang, 'home.downloadResume')}
+      </a>
+      <a class="cta quiet" href={withBase('/id/contact/')}>
+        {t(lang, 'home.contactCta')}
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Rekayasa dalam praktik</h2>
+    <p class="lede">
+      Pekerjaan saya mencakup seluruh siklus rekayasa: memahami masalah, bereksperimen dengan model,
+      merancang pipeline, membangun API, dan mengintegrasikan solusi ke sistem yang lebih besar —
+      computer vision di perangkat edge, aplikasi LLM dengan retrieval-augmented generation, dan
+      infrastruktur backend yang membuatnya andal.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2>{t(lang, 'home.featured')}</h2>
+    <div class="grid">
+      {featured.length === 0 && <p class="empty">{t(lang, 'home.featuredEmpty')}</p>}
+      {featured.map((entry) => (
+        <ProjectCard entry={{ slug: entrySlug(entry.id), data: entry.data }} />
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>{t(lang, 'home.expertise')}</h2>
+    <div class="expertise-table">
+      <table>
+        <tbody>
+          {expertise.map((group) => (
+            <tr>
+              <th scope="row">{group.area}</th>
+              <td>{group.tech.join(' · ')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div class="expertise-list">
+      {expertise.map((group) => (
+        <div class="expertise-group">
+          <p class="mono area">{group.area}</p>
+          <div class="tech">
+            {group.tech.map((item) => (
+              <span class="chip mono">{item}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>{t(lang, 'home.journey')}</h2>
+    <ol class="timeline">
+      {journey.map((step) => (
+        <li>
+          <p class="place">{step.place}</p>
+          <p class="role">{step.role}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="section closing">
+    <h2>Punya masalah menarik untuk diselesaikan atau proyek untuk didiskusikan?</h2>
+    <a class="cta" href={withBase('/id/contact/')}>
+      {t(lang, 'home.contactCta')}
+    </a>
   </section>
 </Base>
 
@@ -30,13 +148,214 @@ import { t } from '../../i18n/ui';
   }
 
   .hero h1 {
-    font-size: var(--text-3xl);
+    font-size: var(--text-4xl);
     max-width: 24ch;
   }
 
   .lede {
     margin-top: var(--space-4);
-    max-width: 52ch;
+    max-width: 56ch;
     font-size: var(--text-lg);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+
+  .chip {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-pill);
+    padding: var(--space-1) var(--space-3);
+  }
+
+  .available {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    color: var(--neon-cyan);
+    font-size: var(--text-sm);
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--neon-cyan);
+    box-shadow: 0 0 8px rgba(76, 201, 240, 0.8);
+  }
+
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+  }
+
+  .cta {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--surface-0);
+    background: var(--neon-magenta);
+    border-radius: var(--radius-pill);
+    padding: var(--space-2) var(--space-5);
+    text-decoration: none;
+    transition:
+      box-shadow var(--transition-fast),
+      transform var(--transition-fast);
+  }
+
+  .cta:hover {
+    box-shadow: var(--glow-magenta);
+    transform: translateY(-1px);
+  }
+
+  .cta.quiet {
+    color: var(--text-body);
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+  }
+
+  .cta.quiet:hover {
+    color: var(--text-high);
+    box-shadow: var(--glow-violet);
+  }
+
+  .section {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-8) var(--container-pad) 0;
+  }
+
+  .section h2 {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-5);
+  }
+
+  .empty {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 760px) {
+    .grid {
+      grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    }
+  }
+
+  .expertise-list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .expertise-group .area {
+    color: var(--neon-violet);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+  }
+
+  .expertise-group .tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .expertise-table {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .expertise-list {
+      display: none;
+    }
+
+    .expertise-table {
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: var(--text-sm);
+    }
+
+    th {
+      color: var(--text-high);
+      font-family: var(--font-display);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    td {
+      color: var(--text-body);
+    }
+  }
+
+  .timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .timeline li {
+    border-left: 2px solid var(--border-subtle);
+    padding-left: var(--space-5);
+    position: relative;
+  }
+
+  .timeline li::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 0.35rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--neon-magenta);
+    box-shadow: var(--glow-magenta);
+  }
+
+  .place {
+    color: var(--text-high);
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
+
+  .role {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .closing {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+    padding-bottom: var(--space-9);
+  }
+
+  .closing h2 {
+    font-size: var(--text-2xl);
+    max-width: 34ch;
   }
 </style>

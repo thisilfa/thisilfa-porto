@@ -1,0 +1,277 @@
+---
+// About — engineer profile, not a CV restated. Education lives only in the
+// downloadable PDF (origin R5 / AE3): nothing here names a school or degree.
+import { Image } from 'astro:assets';
+import Base from '../layouts/base.astro';
+import { t } from '../i18n/ui';
+import { withBase } from '../lib/urls';
+import portrait from '../assets/profile/neon-cat-lounge.png';
+
+const lang = 'en' as const;
+
+const interests = [
+  'Computer Vision and visual intelligence',
+  'Machine Learning and anomaly detection',
+  'LLM applications and Retrieval-Augmented Generation',
+  'AI system architecture',
+  'Edge AI and model optimization',
+  'Intelligent automation',
+];
+
+const philosophy = [
+  {
+    name: 'Problem before technology',
+    body: 'Understand the problem before selecting a model or framework.',
+  },
+  {
+    name: 'Experimentation over assumptions',
+    body: 'Validate technical decisions through experiments.',
+  },
+  { name: 'End-to-end thinking', body: 'Consider the complete system, not only the model.' },
+  {
+    name: 'Practical engineering',
+    body: 'Prioritize reliability, maintainability, and measurable outcomes.',
+  },
+];
+
+const experience = [
+  {
+    place: 'Biologic Technik',
+    role: 'Computer Vision Engineer',
+    note: 'Hospital inventory vision systems, surgical instrument identification, LLM market intelligence.',
+  },
+  {
+    place: 'Quick Tractor',
+    role: 'Junior ML / Data Engineer',
+    note: 'Workplace safety detection, face attendance, visual product search.',
+  },
+];
+---
+
+<Base
+  lang={lang}
+  title={`${t(lang, 'site.name')} — ${t(lang, 'nav.about')}`}
+  description="An AI Engineer with hands-on experience developing and integrating machine learning solutions into practical applications."
+>
+  <section class="about texture-grid">
+    <div class="portrait">
+      <Image
+        src={portrait}
+        alt="Illustrated portrait of Silfaradila at a neon-lit desk with her cat, in the site's magenta-and-violet cyberpunk palette"
+        width={600}
+        loading="eager"
+      />
+    </div>
+    <div class="story">
+      <p class="kicker mono">{t(lang, 'nav.about')}</p>
+      <h1>AI Engineer, end to end.</h1>
+      <p class="lede">
+        I'm an AI Engineer with hands-on experience developing and integrating machine learning
+        solutions into practical applications.
+      </p>
+      <p>
+        My work spans computer vision, machine learning, backend development, and LLM-powered
+        systems. I enjoy working across the engineering lifecycle — from understanding problems and
+        experimenting with models to designing pipelines, building APIs, and integrating solutions
+        into larger systems.
+      </p>
+      <p>
+        I'm particularly interested in building reliable, scalable, and practical AI applications
+        that address real-world challenges.
+      </p>
+      <a class="cta" href={withBase('/contact/')}>
+        {t(lang, 'home.contactCta')}
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Areas of interest</h2>
+    <ul class="interests">
+      {interests.map((item) => (
+        <li>{item}</li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>Engineering philosophy</h2>
+    <div class="principles">
+      {philosophy.map((principle) => (
+        <div class="principle">
+          <p class="mono name">{principle.name}</p>
+          <p>{principle.body}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Professional experience</h2>
+    <div class="experience">
+      {experience.map((role) => (
+        <div class="role-card">
+          <p class="place">{role.place}</p>
+          <p class="title">{role.role}</p>
+          <p class="note">{role.note}</p>
+          <a href={withBase('/projects/')}>{t(lang, 'home.exploreProjects')} →</a>
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .about {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-9) var(--container-pad) var(--space-7);
+    display: grid;
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  @media (min-width: 760px) {
+    .about {
+      grid-template-columns: minmax(16rem, 22rem) 1fr;
+    }
+  }
+
+  .portrait :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--glow-violet);
+  }
+
+  .kicker {
+    color: var(--neon-magenta);
+    font-size: var(--text-xs);
+    letter-spacing: 0.18em;
+    margin-bottom: var(--space-3);
+  }
+
+  .story h1 {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .story p {
+    max-width: 60ch;
+    margin-top: var(--space-3);
+  }
+
+  .lede {
+    font-size: var(--text-lg);
+    color: var(--text-high);
+  }
+
+  .story .cta {
+    display: inline-block;
+    margin-top: var(--space-5);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--surface-0);
+    background: var(--neon-magenta);
+    border-radius: var(--radius-pill);
+    padding: var(--space-2) var(--space-5);
+    text-decoration: none;
+  }
+
+  .story .cta:hover {
+    box-shadow: var(--glow-magenta);
+  }
+
+  .section {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-7) var(--container-pad) 0;
+  }
+
+  .section h2 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-5);
+  }
+
+  .interests {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .interests li {
+    border-left: 2px solid var(--neon-violet);
+    padding-left: var(--space-4);
+    color: var(--text-body);
+  }
+
+  .principles {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .principles {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .principle {
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .principle .name {
+    color: var(--neon-violet);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+  }
+
+  .principle p:last-child {
+    font-size: var(--text-sm);
+    color: var(--text-body);
+  }
+
+  .experience {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .role-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-5);
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .place {
+    color: var(--text-high);
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
+
+  .title {
+    color: var(--neon-magenta);
+    font-size: var(--text-sm);
+  }
+
+  .note {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    max-width: 68ch;
+  }
+
+  .role-card a {
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+</style>
