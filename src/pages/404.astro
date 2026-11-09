@@ -1,0 +1,87 @@
+---
+/** Bilingual 404: GitHub Pages serves one 404.html for every path, so both
+ * locales' copy and home links live on this single page (lang="en"). */
+import Base from '../layouts/base.astro';
+import { t } from '../i18n/ui';
+import { withBase } from '../lib/urls';
+---
+
+<Base title={t('en', 'notfound.title')} description={t('en', 'notfound.body')}>
+  <section class="notfound texture-grid">
+    <p class="code mono" aria-hidden="true">
+      404
+    </p>
+    <h1>
+      {t('en', 'notfound.title')} — {t('id', 'notfound.title')}
+    </h1>
+    <p class="body">{t('en', 'notfound.body')}</p>
+    <p class="body">{t('id', 'notfound.body')}</p>
+    <div class="ways">
+      <a class="cta" href={withBase('/')}>
+        {t('en', 'notfound.home.en')}
+      </a>
+      <a class="cta quiet" href={withBase('/id/')}>
+        {t('en', 'notfound.home.id')}
+      </a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .notfound {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-9) var(--container-pad);
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+
+  .code {
+    color: var(--neon-magenta);
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    text-shadow: var(--glow-magenta);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+  }
+
+  .body {
+    max-width: 52ch;
+  }
+
+  .ways {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+  }
+
+  .cta {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-pill);
+    padding: var(--space-2) var(--space-5);
+    transition:
+      box-shadow var(--transition-fast),
+      color var(--transition-fast);
+  }
+
+  .cta:hover {
+    box-shadow: var(--glow-magenta);
+  }
+
+  .cta.quiet {
+    color: var(--text-body);
+    border-color: var(--border-subtle);
+  }
+
+  .cta.quiet:hover {
+    color: var(--text-high);
+    box-shadow: var(--glow-violet);
+  }
+</style>

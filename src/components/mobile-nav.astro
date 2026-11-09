@@ -1,0 +1,118 @@
+---
+/** Mobile navigation disclosure. Vanilla script, no hydration: a toggle with
+ * aria-expanded, Escape to close, focus returns to the toggle. Hidden above
+ * 640px — the desktop nav in header.astro takes over there. */
+import { navItems, navPaths, t, type Lang } from '../i18n/ui';
+import { withBase } from '../lib/urls';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+---
+
+<div class="mobile-nav">
+  <button type="button" class="toggle" aria-expanded="false" aria-controls="mobile-menu">
+    <span class="mono" aria-hidden="true">
+      ≡
+    </span>
+    <span class="visually-hidden">Menu</span>
+  </button>
+  <nav id="mobile-menu" class="panel" hidden aria-label={t(lang, 'nav.home')}>
+    {navItems.map((item) => (
+      <a href={withBase(navPaths[item])}>{t(lang, `nav.${item}` as const)}</a>
+    ))}
+  </nav>
+</div>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.mobile-nav .toggle');
+  const panel = document.querySelector<HTMLElement>('.mobile-nav .panel');
+
+  if (toggle && panel) {
+    const close = () => {
+      toggle.setAttribute('aria-expanded', 'false');
+      panel.hidden = true;
+      toggle.focus();
+    };
+
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!open));
+      panel.hidden = open;
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        close();
+      }
+    });
+
+    panel.addEventListener('click', (event) => {
+      if (event.target instanceof HTMLAnchorElement) {
+        toggle.setAttribute('aria-expanded', 'false');
+        panel.hidden = true;
+      }
+    });
+  }
+</script>
+
+<style>
+  .mobile-nav {
+    display: none;
+    position: relative;
+  }
+
+  @media (max-width: 640px) {
+    .mobile-nav {
+      display: block;
+    }
+  }
+
+  .toggle {
+    color: var(--text-high);
+    font-size: var(--text-xl);
+    line-height: 1;
+    padding: var(--space-2);
+  }
+
+  .toggle:hover {
+    color: var(--neon-magenta);
+  }
+
+  .panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + var(--space-2));
+    min-width: 12rem;
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: var(--glow-violet);
+    display: grid;
+    padding: var(--space-2);
+  }
+
+  .panel a {
+    color: var(--text-body);
+    text-decoration: none;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+  }
+
+  .panel a:hover {
+    color: var(--text-high);
+    background: var(--surface-2);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+</style>

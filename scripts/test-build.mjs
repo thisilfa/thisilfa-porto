@@ -34,4 +34,46 @@ if (!xml.includes('https://thisilfa.github.io/thisilfa-porto')) {
   process.exit(1);
 }
 
+// AE2: every locale's home page renders exactly five nav entries, and no
+// nav entry ever points at Personal Lab or Engineering Journal.
+const homePages = ['index.html', 'id/index.html'];
+for (const page of homePages) {
+  const url = new URL(page, dist);
+  if (!(await exists(url))) continue; // locale pages appear from U6 onward
+  const html = await readFile(url, 'utf8');
+  const desktopNav = html.match(/<nav class="desktop-nav[^"]*"[^>]*>([\s\S]*?)<\/nav>/);
+  if (!desktopNav) {
+    console.error(`test:build — ${page}: desktop nav not found`);
+    process.exit(1);
+  }
+  const entries = (desktopNav[1].match(/<a /g) ?? []).length;
+  if (entries !== 5) {
+    console.error(`test:build — ${page}: expected 5 nav entries, found ${entries}`);
+    process.exit(1);
+  }
+  if (/lab|journal/i.test(desktopNav[1])) {
+    console.error(`test:build — ${page}: deferred section leaked into the nav`);
+    process.exit(1);
+  }
+}
+
+// The 404 serves both locales from one page, with base-prefixed home links.
+const notFound = new URL('404.html', dist);
+if (!(await exists(notFound))) {
+  console.error('test:build — dist/404.html missing');
+  process.exit(1);
+}
+const nf = await readFile(notFound, 'utf8');
+for (const marker of [
+  'href="/thisilfa-porto/"',
+  'href="/thisilfa-porto/id/"',
+  'Page not found',
+  'Halaman tidak ditemukan',
+]) {
+  if (!nf.includes(marker)) {
+    console.error(`test:build — 404.html is missing: ${marker}`);
+    process.exit(1);
+  }
+}
+
 console.log('test:build — ok');

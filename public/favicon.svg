@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Neon cat mark: dark rounded tile, magenta cat-ears silhouette. -->
+  <rect width="32" height="32" rx="7" fill="#0b0713"/>
+  <path d="M7 24 L9 10 L13.5 15 L16 9 L18.5 15 L23 10 L25 24 Z" fill="none" stroke="#f04fc0" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="12.5" cy="20.5" r="1.1" fill="#9d6bff"/>
+  <circle cx="19.5" cy="20.5" r="1.1" fill="#9d6bff"/>
+</svg>

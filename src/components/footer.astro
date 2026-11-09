@@ -1,0 +1,104 @@
+---
+/** Site footer: name, tagline, the five nav entries, and the contact links.
+ * The contact addresses are real values (origin R10); GitHub and LinkedIn
+ * open externally, email opens the mail client. */
+import { navItems, navPaths, t, type Lang } from '../i18n/ui';
+import { withBase } from '../lib/urls';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="inner">
+    <div class="who">
+      <p class="mark mono">{t(lang, 'site.name')}</p>
+      <p class="tagline">{t(lang, 'site.tagline')}</p>
+    </div>
+    <nav class="links" aria-label={t(lang, 'nav.home')}>
+      {navItems.map((item) => (
+        <a href={withBase(navPaths[item])}>{t(lang, `nav.${item}` as const)}</a>
+      ))}
+    </nav>
+    <nav class="socials" aria-label="Social">
+      <a href="mailto:silfaradilamei@gmail.com">silfaradilamei@gmail.com</a>
+      <a href="https://www.linkedin.com/in/silfaradila/" rel="me noopener">
+        LinkedIn
+      </a>
+      <a href="https://github.com/thisilfa" rel="me noopener">
+        GitHub
+      </a>
+    </nav>
+    <p class="note">
+      © {year} Silfaradila Mei Fizahidah. {t(lang, 'footer.builtNote')}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--border-subtle);
+    margin-top: var(--space-9);
+  }
+
+  .inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-7) var(--container-pad);
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .mark {
+    color: var(--text-high);
+    font-weight: 600;
+  }
+
+  .tagline {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    margin-top: var(--space-2);
+    max-width: 44ch;
+  }
+
+  .links,
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .links a {
+    color: var(--text-body);
+    text-decoration: none;
+    font-size: var(--text-sm);
+  }
+
+  .links a:hover {
+    color: var(--neon-magenta);
+  }
+
+  .socials a {
+    font-size: var(--text-sm);
+  }
+
+  .note {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+  }
+
+  @media (min-width: 640px) {
+    .inner {
+      grid-template-columns: 2fr 1fr 1fr;
+      align-items: start;
+    }
+
+    .note {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
