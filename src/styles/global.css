@@ -1,0 +1,5 @@
+/* Design tokens land in U4 (plan: docs/plans/2026-11-09-001-feat-bilingual-portfolio-site-plan.md).
+   Until then: dark scheme baseline only. */
+:root {
+  color-scheme: dark;
+}

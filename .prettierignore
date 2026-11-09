@@ -1,0 +1,7 @@
+# Authoring sources and pipeline artifacts keep their own formatting;
+# Prettier governs code and site content only.
+content/**
+docs/**
+dist/**
+node_modules/**
+.astro/**
