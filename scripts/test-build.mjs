@@ -198,7 +198,17 @@ for (const slug of caseStudies) {
   for (const prefix of ['projects/', 'id/projects/']) {
     const url = new URL(`${prefix}${slug}/index.html`, dist);
     if (!(await exists(url))) {
+      // Diagnostics for a transient build race: show what actually emitted
+      // next to the missing page before failing.
       console.error(`test:build — case study missing: dist/${prefix}${slug}/index.html`);
+      try {
+        const siblings = await readdir(new URL(prefix, dist), { recursive: true });
+        console.error(
+          `test:build — dist/${prefix} contains: ${siblings.join(', ') || '(nothing)'}`,
+        );
+      } catch {
+        console.error(`test:build — dist/${prefix} does not exist at all`);
+      }
       process.exit(1);
     }
     const html = await readFile(url, 'utf8');
