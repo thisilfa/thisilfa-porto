@@ -1,0 +1,196 @@
+---
+// Case-study page — design.md's per-project structure, honesty labels on top,
+// disclosure note at the bottom. A missing translation fails the build.
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/base.astro';
+import { t } from '../../i18n/ui';
+import { assertLocalePairing, getByLocale } from '../../lib/content';
+import { withBase } from '../../lib/urls';
+
+const lang = 'en' as const;
+
+export async function getStaticPaths() {
+  const all = await getCollection('projects');
+  assertLocalePairing(all);
+  const caseStudies = getByLocale(all, 'en').filter((e) => e.data.kind === 'case-study');
+  return caseStudies.map((entry) => ({
+    params: { slug: entry.id.split('/')[1] },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+---
+
+<Base lang={lang} title={`${d.title} — ${t(lang, 'site.name')}`} description={d.overview}>
+  <article class="case">
+    <header class="texture-grid">
+      <p class="labels mono">
+        <span class="label">{t(lang, 'projects.professional')}</span>
+        <span class="label redacted">{t(lang, 'projects.redacted')}</span>
+      </p>
+      <h1>{d.title}</h1>
+      <p class="meta mono">
+        <span>{d.category}</span>
+        {d.company && <span>{d.company}</span>}
+        {d.role && <span>{d.role}</span>}
+        <span class="status status-{d.statusKind}">
+          {t(lang, `status.${d.statusKind}` as const)}
+        </span>
+      </p>
+      <p class="overview">{d.overview}</p>
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <footer class="note">
+      <p class="mono note-label">{t(lang, 'projects.redacted')}</p>
+      <p>{d.disclosure}</p>
+      <a href={withBase('/projects/')}>{t(lang, 'projects.backTo')}</a>
+    </footer>
+  </article>
+</Base>
+
+<style>
+  .case {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-8) var(--container-pad) var(--space-9);
+  }
+
+  header {
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: var(--space-6);
+  }
+
+  .labels {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .label {
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--neon-violet);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-pill);
+    padding: 0.05rem var(--space-3);
+  }
+
+  .label.redacted {
+    color: var(--neon-pumpkin);
+    border-color: rgba(255, 171, 94, 0.45);
+  }
+
+  h1 {
+    font-size: var(--text-3xl);
+    max-width: 26ch;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin-top: var(--space-3);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .status {
+    color: var(--neon-cyan);
+  }
+
+  .status-staging,
+  .status-research,
+  .status-unverified {
+    color: var(--neon-pumpkin);
+  }
+
+  .overview {
+    max-width: 62ch;
+    margin-top: var(--space-4);
+    font-size: var(--text-lg);
+    color: var(--text-high);
+  }
+
+  /* Markdown body styles */
+  .prose :global(h2) {
+    font-size: var(--text-2xl);
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-4);
+  }
+
+  .prose :global(p) {
+    max-width: 68ch;
+    margin-top: var(--space-3);
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    max-width: 68ch;
+    margin-top: var(--space-3);
+    padding-left: var(--space-5);
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .prose :global(ol) {
+    list-style: none;
+    counter-reset: step;
+  }
+
+  .prose :global(ol li) {
+    counter-increment: step;
+    padding-left: var(--space-2);
+  }
+
+  .prose :global(ol li)::before {
+    content: counter(step);
+    color: var(--neon-magenta);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    margin-right: var(--space-3);
+  }
+
+  .prose :global(li) {
+    color: var(--text-body);
+    font-size: var(--text-base);
+  }
+
+  .prose :global(strong) {
+    color: var(--text-high);
+  }
+
+  .note {
+    border-top: 1px solid var(--border-subtle);
+    margin-top: var(--space-7);
+    padding-top: var(--space-5);
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+  }
+
+  .note p {
+    max-width: 68ch;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .note-label {
+    color: var(--neon-pumpkin);
+    font-size: var(--text-xs) !important;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .note a {
+    font-size: var(--text-sm);
+  }
+</style>

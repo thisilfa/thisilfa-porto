@@ -191,4 +191,37 @@ for (const contactFile of ['contact.html', 'id/contact.html']) {
   }
 }
 
+// U9: three case studies in both locales, each with its disclosure note and
+// the honesty labels; CSSD never claims production readiness (R11).
+const caseStudies = ['sims', 'cssd-instrument-id', 'prophesy-ai-prime'];
+for (const slug of caseStudies) {
+  for (const prefix of ['projects/', 'id/projects/']) {
+    const url = new URL(`${prefix}${slug}/index.html`, dist);
+    if (!(await exists(url))) {
+      console.error(`test:build — case study missing: dist/${prefix}${slug}/index.html`);
+      process.exit(1);
+    }
+    const html = await readFile(url, 'utf8');
+    const disclosureInEntry = /excluded|not included|tidak dicantumkan/i.test(html);
+    if (!disclosureInEntry) {
+      console.error(`test:build — ${prefix}${slug} has no disclosure note`);
+      process.exit(1);
+    }
+    if (!html.includes('Partially Redacted') && !html.includes('Sebagian Disunting')) {
+      console.error(`test:build — ${prefix}${slug} is missing its honesty labels`);
+      process.exit(1);
+    }
+  }
+}
+const cssd = {
+  en: await readFile(new URL('projects/cssd-instrument-id/index.html', dist), 'utf8'),
+  id: await readFile(new URL('id/projects/cssd-instrument-id/index.html', dist), 'utf8'),
+};
+for (const [locale, html] of Object.entries(cssd)) {
+  if (/production[- ]ready|production ready|siap produksi|siap untuk produksi/i.test(html)) {
+    console.error(`test:build — CSSD (${locale}) claims production readiness (R11)`);
+    process.exit(1);
+  }
+}
+
 console.log('test:build — ok');
