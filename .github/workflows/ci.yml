@@ -1,0 +1,60 @@
+name: CI
+
+# Checks every pull request into main, and main after each merge.
+# Pull requests also check every commit on its own, because rebase merge
+# lands each commit on main as written.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: npm run build
+      - run: npm run test:build
+
+  commits:
+    name: Every commit
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - name: Check each commit in the pull request
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          for commit in $(git rev-list --reverse "$BASE..$HEAD"); do
+            echo "::group::$(git log -1 --format='%h %s' "$commit")"
+            git checkout --quiet "$commit"
+            npm ci --no-audit --no-fund
+            npm run check
+            echo "::endgroup::"
+          done
