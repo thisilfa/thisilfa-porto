@@ -1,5 +1,194 @@
-/* Design tokens land in U4 (plan: docs/plans/2026-11-09-001-feat-bilingual-portfolio-site-plan.md).
-   Until then: dark scheme baseline only. */
+/*
+ * Design tokens — dark, restrained cyberpunk.
+ * Palette sampled from the site portrait (Neon Cat Lounge): magenta and
+ * violet neon on a violet-tinted near-black, with cyan and pumpkin used
+ * sparingly. Neon is for accents, never body text; body text holds WCAG AA
+ * on every surface. Fonts are wired in astro.config.mjs (Astro Fonts API).
+ */
+
 :root {
   color-scheme: dark;
+
+  /* Surfaces — layered, violet-tinted near-black */
+  --surface-0: #0b0713;
+  --surface-1: #130b20;
+  --surface-2: #1c1230;
+  --surface-3: #291a44;
+
+  /* Text (all AA or better on --surface-0) */
+  --text-high: #f2edf9; /* 14.9:1 — headings */
+  --text-body: #cdc3de; /* 9.6:1 — paragraphs */
+  --text-muted: #9d8fb8; /* 5.3:1 — captions, labels */
+
+  /* Neon accents */
+  --neon-magenta: #f04fc0; /* primary: links, CTAs */
+  --neon-violet: #9d6bff; /* secondary: chips, borders */
+  --neon-cyan: #4cc9f0; /* tertiary: status, sparingly */
+  --neon-pumpkin: #ffab5e; /* warm highlight, rarest */
+
+  /* Signature effects */
+  --glow-magenta: 0 0 24px rgba(240, 79, 192, 0.35);
+  --glow-violet: 0 0 24px rgba(157, 107, 255, 0.3);
+  --grid-line: rgba(157, 107, 255, 0.07);
+  --grid-size: 32px;
+
+  /* Lines */
+  --border-subtle: rgba(157, 107, 255, 0.18);
+  --border-strong: rgba(240, 79, 192, 0.45);
+
+  /* Typography */
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter Variable', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: clamp(1.25rem, 0.5vw + 1.1rem, 1.4rem);
+  --text-2xl: clamp(1.5rem, 1vw + 1.3rem, 1.9rem);
+  --text-3xl: clamp(2rem, 2vw + 1.5rem, 2.6rem);
+  --text-4xl: clamp(2.5rem, 3vw + 1.8rem, 3.4rem);
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+
+  /* Shape and motion */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-pill: 999px;
+  --transition-fast: 150ms ease-out;
+  --transition-slow: 300ms ease-out;
+
+  /* Layout */
+  --container: 72rem;
+  --container-pad: clamp(1rem, 4vw, 2rem);
+}
+
+/* Base element layer — every component builds on this. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-0);
+  color: var(--text-body);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  color: var(--text-high);
+  line-height: 1.15;
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--neon-magenta);
+  text-decoration-color: rgba(240, 79, 192, 0.4);
+  text-underline-offset: 3px;
+  transition:
+    color var(--transition-fast),
+    text-decoration-color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--text-high);
+  text-decoration-color: var(--neon-magenta);
+}
+
+code,
+kbd,
+.mono {
+  font-family: var(--font-mono);
+}
+
+::selection {
+  background: rgba(240, 79, 192, 0.35);
+  color: var(--text-high);
+}
+
+/* Interactive states — components consume these; they never improvise. */
+:focus-visible {
+  outline: 2px solid var(--neon-magenta);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+button:hover {
+  color: var(--text-high);
+}
+
+/* Signature effect: faint neon grid, for hero and section moments only. */
+.texture-grid {
+  position: relative;
+  isolation: isolate;
+}
+
+.texture-grid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 20%, black 30%, transparent 75%);
+  pointer-events: none;
+}
+
+/* Signature effect: neon glow, on accent elements only. */
+.glow-magenta {
+  box-shadow: var(--glow-magenta);
+}
+
+.glow-violet {
+  box-shadow: var(--glow-violet);
+}
+
+/* Motion safety: the effects are static by default; nothing animates
+   for visitors who opt out of motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
 }

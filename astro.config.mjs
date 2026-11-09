@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 
@@ -23,4 +23,26 @@ export default defineConfig({
     defaultLocale: 'en',
     routing: { prefixDefaultLocale: false },
   },
+  // Self-hosted fonts (fontsource, downloaded at build time and cached):
+  // Space Grotesk for display, Inter for body, JetBrains Mono for accents.
+  fonts: [
+    {
+      provider: fontProviders.fontsource(),
+      name: 'Space Grotesk Variable',
+      cssVariable: '--font-display',
+      weights: ['300 700'],
+    },
+    {
+      provider: fontProviders.fontsource(),
+      name: 'Inter Variable',
+      cssVariable: '--font-body',
+      weights: ['100 900'],
+    },
+    {
+      provider: fontProviders.fontsource(),
+      name: 'JetBrains Mono Variable',
+      cssVariable: '--font-mono',
+      weights: ['100 800'],
+    },
+  ],
 });
