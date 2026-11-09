@@ -1,0 +1,81 @@
+---
+/** Language switcher: the destination locale is a link built from the current
+ * path (trailing slash normalized, equivalent page checked against the route
+ * map, home as fallback); the current locale is a non-interactive
+ * aria-current label — never a self-link. */
+import { languages, locales, type Lang } from '../i18n/ui';
+import { buildRouteMap, translatePath } from '../i18n/utils';
+import { withBase } from '../lib/urls';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const pages = import.meta.glob<string>('/src/pages/**/*.astro');
+const routeMap = buildRouteMap(Object.keys(pages));
+const base = import.meta.env.BASE_URL;
+
+const currentPath = Astro.url.pathname;
+const labels: Record<Lang, string> = { en: 'EN', id: 'ID' };
+
+const entries = locales.map((locale) => {
+  const translated = translatePath(currentPath, base, locale, routeMap);
+  return {
+    locale,
+    label: labels[locale],
+    name: languages[locale],
+    path: translated,
+    current: locale === lang,
+  };
+});
+---
+
+<div class="switcher mono" role="group" aria-label="Language">
+  {entries.map((entry) =>
+    entry.current ? (
+      <span class="current" aria-current="true">
+        {entry.label}
+      </span>
+    ) : (
+      <a href={withBase(entry.path)} lang={entry.locale} aria-label={entry.name} title={entry.name}>
+        {entry.label}
+      </a>
+    ),
+  )}
+</div>
+
+<style>
+  .switcher {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+  }
+
+  .switcher a {
+    color: var(--text-muted);
+    text-decoration: none;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-pill);
+    padding: 0.05rem var(--space-2);
+    transition:
+      color var(--transition-fast),
+      border-color var(--transition-fast);
+  }
+
+  .switcher a:hover {
+    color: var(--neon-magenta);
+    border-color: var(--border-strong);
+  }
+
+  .current {
+    color: var(--text-high);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-pill);
+    padding: 0.05rem var(--space-2);
+    background: var(--surface-2);
+  }
+</style>

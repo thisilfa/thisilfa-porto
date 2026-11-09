@@ -1,0 +1,61 @@
+---
+/** The per-page SEO cluster: canonical, hreflang alternates (en-US, id-ID,
+ * self-referencing, x-default — the same tag set the sitemap map uses), Open
+ * Graph with the site-default image fallback, og:locale pairs. Absolute URLs
+ * come from astro:i18n so site + base + routing config stay authoritative. */
+import { getAbsoluteLocaleUrl } from 'astro:i18n';
+import { locales, ui, type Lang } from '../i18n/ui';
+import { buildRouteMap, neutralRoute, routeInLocale, stripBase } from '../i18n/utils';
+import { withBase } from '../lib/urls';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description?: string;
+}
+
+const { lang, title, description } = Astro.props;
+
+const pages = import.meta.glob<string>('/src/pages/**/*.astro');
+const routeMap = buildRouteMap(Object.keys(pages));
+const route = neutralRoute(stripBase(Astro.url.pathname, import.meta.env.BASE_URL));
+
+const hreflangTags: Record<Lang, string> = { en: 'en-US', id: 'id-ID' };
+const ogLocales: Record<Lang, string> = { en: 'en_US', id: 'id_ID' };
+
+const absoluteFor = (locale: Lang): string => {
+  const localized = routeInLocale(routeMap, route, locale) ?? '/';
+  return getAbsoluteLocaleUrl(locale, localized);
+};
+
+const canonical = absoluteFor(lang);
+const alternates = locales.map((locale) => ({
+  hreflang: hreflangTags[locale],
+  href: absoluteFor(locale),
+}));
+const xDefault = absoluteFor('en');
+
+const fallbackDescription = description || ui[lang]['site.tagline'];
+const ogImage = withBase('/og-default.png');
+const ogImageAbs = new URL(ogImage, Astro.site ?? 'https://thisilfa.github.io').href;
+const otherLocales = locales.filter((locale) => locale !== lang);
+---
+
+<title>{title}</title>
+<meta name="description" content={fallbackDescription} />
+<link rel="canonical" href={canonical} />
+{alternates.map((alt) => (
+  <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
+))}
+<link rel="alternate" hreflang="x-default" href={xDefault} />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={fallbackDescription} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImageAbs} />
+<meta property="og:locale" content={ogLocales[lang]} />
+{otherLocales.map((locale) => (
+  <meta property="og:locale:alternate" content={ogLocales[locale]} />
+))}
+<meta name="twitter:card" content="summary_large_image" />

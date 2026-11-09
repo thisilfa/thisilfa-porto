@@ -1,0 +1,42 @@
+---
+// Placeholder halaman beranda Indonesia — digantikan halaman sesungguhnya di U8.
+import Base from '../../layouts/base.astro';
+import { t } from '../../i18n/ui';
+---
+
+<Base lang="id" title={`${t('id', 'site.name')} — Beranda`} description={t('id', 'site.tagline')}>
+  <section class="texture-grid hero">
+    <p class="kicker mono">U6 · PLACEHOLDER /ID/</p>
+    <h1>{t('id', 'site.tagline')}</h1>
+    <p class="lede">
+      Halaman beranda Indonesia. Struktur lengkap menyusul di U8 — untuk saat ini halaman ini
+      menjadi target pergantian bahasa dan membuktikan routing /id/ berfungsi.
+    </p>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding: var(--space-9) var(--container-pad) var(--space-8);
+    max-width: var(--container);
+    margin: 0 auto;
+  }
+
+  .kicker {
+    color: var(--neon-magenta);
+    font-size: var(--text-xs);
+    letter-spacing: 0.18em;
+    margin-bottom: var(--space-4);
+  }
+
+  .hero h1 {
+    font-size: var(--text-3xl);
+    max-width: 24ch;
+  }
+
+  .lede {
+    margin-top: var(--space-4);
+    max-width: 52ch;
+    font-size: var(--text-lg);
+  }
+</style>

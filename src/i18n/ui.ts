@@ -13,6 +13,9 @@ export type Lang = keyof typeof languages;
 
 export const defaultLang: Lang = 'en';
 
+/** Every locale the site builds, mirroring astro.config.mjs. */
+export const locales: Lang[] = ['en', 'id'];
+
 /** The five live sections, in nav order (plan R3 / AE2). */
 export const navItems = ['home', 'about', 'projects', 'resume', 'contact'] as const;
 
