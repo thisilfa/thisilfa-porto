@@ -1,51 +1,47 @@
 ---
 // Token showcase — scaffold placeholder. Replaced by the real Home page in U8;
 // exists so design tokens (U4) are reviewable in the PR.
-import '../styles/global.css';
+import Base from '../layouts/base.astro';
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Silfaradila Mei Fizahidah — token showcase</title>
-  </head>
-  <body>
-    <header class="texture-grid hero">
-      <p class="kicker mono">U4 · DESIGN TOKENS</p>
-      <h1>Building intelligent systems through practical engineering.</h1>
-      <p class="lede">
-        Sample of the design system: display type, body copy at AA contrast, neon accents reserved
-        for interactive elements.
+<Base
+  lang="en"
+  title="Silfaradila Mei Fizahidah — token showcase"
+  description="Design-system sample page while the portfolio is under construction."
+>
+  <section class="texture-grid hero">
+    <p class="kicker mono">U4 · DESIGN TOKENS</p>
+    <h1>Building intelligent systems through practical engineering.</h1>
+    <p class="lede">
+      Sample of the design system: display type, body copy at AA contrast, neon accents reserved for
+      interactive elements.
+    </p>
+    <div class="chips">
+      <span class="chip mono">Computer Vision</span>
+      <span class="chip mono">Machine Learning</span>
+      <span class="chip mono">LLM &amp; RAG</span>
+      <span class="chip mono">Backend Engineering</span>
+    </div>
+  </section>
+  <section class="wrap">
+    <div class="card">
+      <h2>Card surface (—surface-1)</h2>
+      <p>
+        Body copy sits here. <a href="#">This is a link</a> in neon magenta; focus it with the
+        keyboard to see the focus ring, hover it to see the state shift.
       </p>
-      <div class="chips">
-        <span class="chip mono">Computer Vision</span>
-        <span class="chip mono">Machine Learning</span>
-        <span class="chip mono">LLM &amp; RAG</span>
-        <span class="chip mono">Backend Engineering</span>
-      </div>
-    </header>
-    <main class="wrap">
-      <section class="card">
-        <h2>Card surface (—surface-1)</h2>
-        <p>
-          Body copy sits here. <a href="#">This is a link</a> in neon magenta; focus it with the
-          keyboard to see the focus ring, hover it to see the state shift.
-        </p>
-        <button class="cta">Primary CTA</button>
-        <button>Quiet button</button>
-      </section>
-      <section class="card glow-violet">
-        <h2>Same card, glow effect</h2>
-        <p>
-          The glow is a single token (--glow-violet), applied only to accent moments. The grid
-          texture above fades out radially — both effects are static and honor
-          prefers-reduced-motion.
-        </p>
-      </section>
-    </main>
-  </body>
-</html>
+      <button class="cta">Primary CTA</button>
+      <button>Quiet button</button>
+    </div>
+    <div class="card glow-violet">
+      <h2>Same card, glow effect</h2>
+      <p>
+        The glow is a single token (--glow-violet), applied only to accent moments. The grid texture
+        above fades out radially — both effects are static and honor prefers-reduced-motion.
+      </p>
+    </div>
+  </section>
+</Base>
 
 <style>
   .hero {

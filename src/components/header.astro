@@ -1,0 +1,85 @@
+---
+/** Site header: name mark on the left, five-entry nav on the right,
+ * mobile disclosure below the breakpoint. The language switcher (U6)
+ * slots in beside the nav. */
+import { navItems, navPaths, t, type Lang } from '../i18n/ui';
+import { withBase } from '../lib/urls';
+import MobileNav from './mobile-nav.astro';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="inner">
+    <a class="mark mono" href={withBase(navPaths.home)}>
+      {t(lang, 'site.name')}
+    </a>
+    <nav class="desktop-nav" aria-label={t(lang, 'nav.home')}>
+      {navItems.map((item) => (
+        <a href={withBase(navPaths[item])}>{t(lang, `nav.${item}` as const)}</a>
+      ))}
+    </nav>
+    <MobileNav lang={lang} />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in oklab, var(--surface-0) 85%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-3) var(--container-pad);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .mark {
+    color: var(--text-high);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .mark:hover {
+    color: var(--neon-magenta);
+  }
+
+  .desktop-nav {
+    display: flex;
+    gap: var(--space-5);
+  }
+
+  .desktop-nav a {
+    color: var(--text-body);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    transition: color var(--transition-fast);
+  }
+
+  .desktop-nav a:hover {
+    color: var(--neon-magenta);
+  }
+
+  @media (max-width: 640px) {
+    .desktop-nav {
+      display: none;
+    }
+  }
+</style>
