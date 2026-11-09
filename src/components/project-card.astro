@@ -24,13 +24,12 @@ interface Props {
 
 const { entry } = Astro.props;
 const href = withBase(`/projects/${entry.slug}/`);
+const isCaseStudy = entry.data.kind === 'case-study';
 ---
 
 <article class="card">
   <header>
-    <h3>
-      <a href={href}>{entry.data.title}</a>
-    </h3>
+    <h3>{isCaseStudy ? <a href={href}>{entry.data.title}</a> : entry.data.title}</h3>
     <p class="meta mono">
       <span class="category">{entry.data.category}</span>
       <span class="status status-{entry.data.statusKind}">{entry.data.statusKind}</span>
