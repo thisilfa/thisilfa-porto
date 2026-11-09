@@ -4,6 +4,7 @@
  * slots in beside the nav. */
 import { navItems, navPaths, t, type Lang } from '../i18n/ui';
 import { withBase } from '../lib/urls';
+import LanguageSwitcher from './language-switcher.astro';
 import MobileNav from './mobile-nav.astro';
 
 interface Props {
@@ -23,7 +24,10 @@ const { lang = 'en' } = Astro.props;
         <a href={withBase(navPaths[item])}>{t(lang, `nav.${item}` as const)}</a>
       ))}
     </nav>
-    <MobileNav lang={lang} />
+    <div class="end">
+      <LanguageSwitcher lang={lang} />
+      <MobileNav lang={lang} />
+    </div>
   </div>
 </header>
 
@@ -75,6 +79,12 @@ const { lang = 'en' } = Astro.props;
 
   .desktop-nav a:hover {
     color: var(--neon-magenta);
+  }
+
+  .end {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
   }
 
   @media (max-width: 640px) {

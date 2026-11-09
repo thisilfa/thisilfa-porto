@@ -16,6 +16,14 @@ export default defineConfig({
         defaultLocale: 'en',
         locales: { en: 'en-US', id: 'id-ID' },
       },
+      // The integration never emits x-default on its own: add it per entry,
+      // pointing at the English (unprefixed) equivalent of the same page.
+      // (The emitter supplies rel="alternate" for every link entry.)
+      serialize(item) {
+        const englishUrl = item.url.includes('/id/') ? item.url.replace('/id/', '/') : item.url;
+        item.links = [...(item.links ?? []), { url: englishUrl, lang: 'x-default' }];
+        return item;
+      },
     }),
   ],
   i18n: {

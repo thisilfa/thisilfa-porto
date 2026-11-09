@@ -33,6 +33,12 @@ if (!xml.includes('https://thisilfa.github.io/thisilfa-porto')) {
   console.error('test:build — sitemap URLs do not carry the /thisilfa-porto base');
   process.exit(1);
 }
+for (const marker of ['hreflang="en-US"', 'hreflang="id-ID"', 'hreflang="x-default"']) {
+  if (!xml.includes(marker)) {
+    console.error(`test:build — sitemap is missing ${marker} alternates`);
+    process.exit(1);
+  }
+}
 
 // AE2: every locale's home page renders exactly five nav entries, and no
 // nav entry ever points at Personal Lab or Engineering Journal.
@@ -54,6 +60,33 @@ for (const page of homePages) {
   if (/lab|journal/i.test(desktopNav[1])) {
     console.error(`test:build — ${page}: deferred section leaked into the nav`);
     process.exit(1);
+  }
+
+  // The switcher's current locale is a label, not a self-link (plan U6).
+  const switcher = html.match(/<div class="switcher[^"]*"[^>]*>([\s\S]*?)<\/div>/);
+  if (!switcher) {
+    console.error(`test:build — ${page}: language switcher not found`);
+    process.exit(1);
+  }
+  const switcherLinks = (switcher[1].match(/<a /g) ?? []).length;
+  if (switcherLinks !== 1 || !switcher[1].includes('aria-current="true"')) {
+    console.error(
+      `test:build — ${page}: switcher must have exactly one destination link and one aria-current label`,
+    );
+    process.exit(1);
+  }
+
+  // The hreflang cluster: en-US, id-ID, self-referencing, x-default.
+  for (const marker of [
+    'hreflang="en-US"',
+    'hreflang="id-ID"',
+    'hreflang="x-default"',
+    'rel="canonical"',
+  ]) {
+    if (!html.includes(marker)) {
+      console.error(`test:build — ${page}: SEO head is missing ${marker}`);
+      process.exit(1);
+    }
   }
 }
 
