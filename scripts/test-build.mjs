@@ -234,4 +234,71 @@ for (const [locale, html] of Object.entries(cssd)) {
   }
 }
 
+// U10: the full professional census — nine entries per listing locale, every
+// card with a disclosure note, compact entries with no detail pages, and the
+// AI Agent entry honest about being research (AE4).
+for (const listing of ['projects/index.html', 'id/projects/index.html']) {
+  const html = await readFile(new URL(listing, dist), 'utf8');
+  const cards = (html.match(/<article class="card/g) ?? []).length;
+  if (cards !== 9) {
+    console.error(`test:build — ${listing}: expected 9 project cards, found ${cards}`);
+    process.exit(1);
+  }
+  const disclosures = (html.match(/class="disclosure"/g) ?? []).length;
+  if (disclosures !== 9) {
+    console.error(`test:build — ${listing}: expected 9 disclosure notes, found ${disclosures}`);
+    process.exit(1);
+  }
+}
+
+for (const compact of [
+  'clinical-lab-scheduling',
+  'workguard',
+  'face-attendance',
+  'cbir-tokoquick',
+  'yolov5-counting',
+  'ai-agent-research',
+]) {
+  for (const prefix of ['projects/', 'id/projects/']) {
+    if (await exists(new URL(`${prefix}${compact}/index.html`, dist))) {
+      console.error(
+        `test:build — compact entry has a detail page: ${prefix}${compact} (only case studies do)`,
+      );
+      process.exit(1);
+    }
+  }
+}
+
+// The AI Agent card, scoped to its own fragment (a lazy match from the first
+// card would capture all nine and trip on other cards' legitimate words).
+const agentCard = {};
+for (const [locale, file, title] of [
+  ['en', 'projects/index.html', 'Internal AI Agent for Task Manager'],
+  ['id', 'id/projects/index.html', 'AI Agent Internal untuk Task Manager'],
+]) {
+  const html = await readFile(new URL(file, dist), 'utf8');
+  agentCard[locale] =
+    html
+      .split('<article class="card')
+      .slice(1)
+      .map((f) => f.split('</article>')[0])
+      .find((f) => f.includes(title)) ?? '';
+}
+for (const [locale, block] of Object.entries(agentCard)) {
+  if (!block) {
+    console.error(`test:build — AI Agent card not found on the ${locale} listing`);
+    process.exit(1);
+  }
+  if (!/Research|Penelitian/.test(block)) {
+    console.error(`test:build — AI Agent card (${locale}) lacks the research status label (AE4)`);
+    process.exit(1);
+  }
+  if (
+    /\bbuilt\b|\bdeployed\b|\bshipped\b|\bdelivered\b|terdeploy|dibangun dan dikirim/i.test(block)
+  ) {
+    console.error(`test:build — AI Agent card (${locale}) makes a delivery claim (AE4)`);
+    process.exit(1);
+  }
+}
+
 console.log('test:build — ok');
