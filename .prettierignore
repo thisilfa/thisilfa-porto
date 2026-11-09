@@ -5,3 +5,8 @@ docs/**
 dist/**
 node_modules/**
 .astro/**
+
+# Root prose docs keep their hand-wrapped 72-column formatting.
+/*.md
+# GitHub templates are prose too.
+.github/**/*.md
