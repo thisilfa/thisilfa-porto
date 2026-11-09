@@ -56,6 +56,15 @@ const en = {
   'resume.download': 'Download Resume (PDF)',
   'resume.englishOnly': 'The resume is currently available in English.',
 
+  'projects.listing': 'Professional Projects',
+  'projects.backTo': '← All projects',
+  'projects.professional': 'Professional Project',
+  'projects.redacted': 'Partially Redacted',
+  'status.delivered': 'Delivered',
+  'status.staging': 'Staging',
+  'status.research': 'Research',
+  'status.unverified': 'Resume-described; not independently verified',
+
   'notfound.title': 'Page not found',
   'notfound.body': 'The page you are looking for does not exist or has moved.',
   'notfound.home.en': 'Continue in English',
@@ -88,6 +97,15 @@ const id: Record<keyof typeof en, string> = {
   'home.journey': 'Perjalanan Profesional',
   'resume.download': 'Unduh Resume (PDF)',
   'resume.englishOnly': 'Resume saat ini tersedia dalam bahasa Inggris.',
+
+  'projects.listing': 'Proyek Profesional',
+  'projects.backTo': '← Semua proyek',
+  'projects.professional': 'Proyek Profesional',
+  'projects.redacted': 'Sebagian Disunting',
+  'status.delivered': 'Terdeploy',
+  'status.staging': 'Staging',
+  'status.research': 'Penelitian',
+  'status.unverified': 'Dijelaskan di resume; belum terverifikasi independen',
 
   'notfound.title': 'Halaman tidak ditemukan',
   'notfound.body': 'Halaman yang Anda cari tidak ada atau telah dipindahkan.',
