@@ -12,25 +12,37 @@ const lang = 'en' as const;
 const all = await getCollection('projects');
 assertLocalePairing(all);
 const projects = sortProjects(getByLocale(all, lang));
+const professional = projects.filter((entry) => entry.data.type === 'professional');
+const research = projects.filter((entry) => entry.data.type === 'research');
 ---
 
 <Base
   lang={lang}
   title={`${t(lang, 'site.name')} — ${t(lang, 'projects.listing')}`}
-  description="Professional projects across computer vision, machine learning, and applied AI — with honest status and disclosure for every entry."
+  description={t(lang, 'projects.intro')}
 >
   <section class="listing">
     <p class="kicker mono">{t(lang, 'nav.projects')}</p>
     <h1>{t(lang, 'projects.listing')}</h1>
-    <p class="lede">
-      Every professional project, in one place. Case studies link to full write-ups; each entry
-      carries its honest status and a disclosure note.
-    </p>
-    <div class="grid">
-      {projects.map((entry) => (
-        <ProjectCard entry={{ slug: entrySlug(entry.id), data: entry.data }} />
-      ))}
-    </div>
+    <p class="lede">{t(lang, 'projects.intro')}</p>
+    <section class="group">
+      <h2>{t(lang, 'projects.groups.professional')}</h2>
+      <div class="grid">
+        {professional.map((entry) => (
+          <ProjectCard entry={{ slug: entrySlug(entry.id), data: entry.data }} />
+        ))}
+      </div>
+    </section>
+    {research.length > 0 && (
+      <section class="group">
+        <h2>{t(lang, 'projects.groups.research')}</h2>
+        <div class="grid">
+          {research.map((entry) => (
+            <ProjectCard entry={{ slug: entrySlug(entry.id), data: entry.data }} />
+          ))}
+        </div>
+      </section>
+    )}
   </section>
 </Base>
 
@@ -59,10 +71,18 @@ const projects = sortProjects(getByLocale(all, lang));
     font-size: var(--text-sm);
   }
 
+  .group {
+    margin-top: var(--space-6);
+  }
+
+  .group h2 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-5);
+  }
+
   .grid {
     display: grid;
     gap: var(--space-5);
-    margin-top: var(--space-6);
   }
 
   @media (min-width: 760px) {

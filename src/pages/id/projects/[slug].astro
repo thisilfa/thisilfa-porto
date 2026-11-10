@@ -36,12 +36,37 @@ const d = entry.data;
         <span>{d.category}</span>
         {d.company && <span>{d.company}</span>}
         {d.role && <span>{d.role}</span>}
+        {d.period && <span>{d.period}</span>}
         <span class="status status-{d.statusKind}">
           {t(lang, `status.${d.statusKind}` as const)}
         </span>
       </p>
       <p class="overview">{d.overview}</p>
     </header>
+
+    {d.contribution && d.contribution.length > 0 && (
+      <section class="contribution" aria-labelledby="contribution-heading">
+        <h2 id="contribution-heading">{t(lang, 'projects.contribution')}</h2>
+        {d.contribution.map((group) =>
+          group.group === 'unattributed' ? (
+            <p class="unattributed">
+              <span class="mono group-label">{t(lang, 'contribution.unattributed')}</span>
+              {' — '}
+              {group.items.join(' · ')}
+            </p>
+          ) : (
+            <div class="group">
+              <p class="mono group-label">{t(lang, `contribution.${group.group}` as const)}</p>
+              <ul>
+                {group.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ),
+        )}
+      </section>
+    )}
 
     <div class="prose">
       <Content />
@@ -118,6 +143,56 @@ const d = entry.data;
     margin-top: var(--space-4);
     font-size: var(--text-lg);
     color: var(--text-high);
+  }
+
+  .contribution {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+    padding: var(--space-5) var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+
+  .contribution h2 {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .contribution .group + .group {
+    margin-top: var(--space-4);
+  }
+
+  .group-label {
+    color: var(--neon-violet);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+  }
+
+  .contribution ul {
+    margin: 0;
+    padding-left: var(--space-5);
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .contribution li {
+    font-size: var(--text-sm);
+    color: var(--text-body);
+  }
+
+  .unattributed {
+    border-top: 1px solid var(--border-subtle);
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .unattributed .group-label {
+    color: var(--text-muted);
+    margin-bottom: 0;
   }
 
   .prose :global(h2) {
