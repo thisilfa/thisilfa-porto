@@ -23,7 +23,7 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const d = entry.data;
-const Diagram = diagramFor(d.diagram, lang);
+const Diagram = diagramFor(d.diagram);
 ---
 
 <Base lang={lang} title={`${d.title} — ${t(lang, 'site.name')}`} description={d.overview}>

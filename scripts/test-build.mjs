@@ -327,4 +327,166 @@ for (const [resumeFile, extra] of [
   }
 }
 
+// U5 (depth plan): the SIMS gold standard — contribution groups, the diagram,
+// and the owner-decided metric sentence in exactly one of its two legal
+// states (defined claim or qualitative, never a bare figure).
+const METRIC_SENTENCES = [
+  'Peak average daily item-counting correctness of 98.6% in October',
+  'Akurasi penghitungan harian rata-rata puncak sebesar 98,6% pada Oktober',
+];
+const metricState = (html) => {
+  const hasSentence = METRIC_SENTENCES.some((s) => html.includes(s));
+  const hasFigure = /98[.,]6\s*%/.test(html);
+  if (hasSentence) return 'defined';
+  if (!hasFigure) return 'qualitative';
+  return 'ILLEGAL'; // figure without its definition — R4 violation
+};
+for (const prefix of ['projects/sims/', 'id/projects/sims/']) {
+  const url = new URL(`${prefix}index.html`, dist);
+  if (!(await exists(url))) {
+    console.error(`test:build — SIMS page missing: dist/${prefix}index.html`);
+    process.exit(1);
+  }
+  const html = await readFile(url, 'utf8');
+
+  // Contribution section: audit groups present, unattributed as the muted
+  // single line, and no unattributed component claimed as implemented.
+  const contribution = html.match(/<section class="contribution"[\s\S]*?<\/section>/)?.[0] ?? '';
+  if (!contribution) {
+    console.error(`test:build — ${prefix}: contribution section missing`);
+    process.exit(1);
+  }
+  const groupLabels = prefix.startsWith('id/')
+    ? // HTML escapes ampersands, so these match the unescaped fragments.
+      [
+        'Saya mengimplementasikan',
+        'Saya berkontribusi dalam',
+        'Dirancang',
+        'Tidak teratribusi individual',
+      ]
+    : ['I implemented', 'I contributed to', 'Designed', 'Not individually attributed'];
+  for (const label of groupLabels) {
+    if (!contribution.includes(label)) {
+      console.error(`test:build — ${prefix}: contribution group missing: ${label}`);
+      process.exit(1);
+    }
+  }
+  // Each rendered group block must not claim unattributed components; the
+  // muted unattributed line is exempt (that is its purpose).
+  const groupBlocks = contribution.match(/<div class="group">[\s\S]*?<\/div>/g) ?? [];
+  if (
+    groupBlocks.some((block) => /camera setup|image acquisition|frontend|dashboard/i.test(block))
+  ) {
+    console.error(
+      `test:build — ${prefix}: unattributed component rendered as an implemented/contributed bullet`,
+    );
+    process.exit(1);
+  }
+
+  // The diagram: inline SVG with role=img and the localized legend.
+  if (!/<svg[^>]*role="img"/.test(html)) {
+    console.error(`test:build — ${prefix}: the architecture diagram (role="img" SVG) is missing`);
+    process.exit(1);
+  }
+  const legendStrings = prefix.startsWith('id/')
+    ? ['Diimplementasikan', 'Konteks — tidak teratribusi individual']
+    : ['Implemented', 'Context — not individually attributed'];
+  const legendOk = legendStrings.every((s) => html.includes(s));
+  if (!legendOk) {
+    console.error(`test:build — ${prefix}: the diagram legend is missing or untranslated`);
+    process.exit(1);
+  }
+
+  // The metric: exactly one legal state (R4).
+  const state = metricState(html);
+  if (state === 'ILLEGAL') {
+    console.error(
+      `test:build — ${prefix}: metric figure appears without its decided definition (R4)`,
+    );
+    process.exit(1);
+  }
+  if (
+    /model accuracy|model accuracy figure|akurasi model|shelf-level/i.test(html) &&
+    !/not a model accuracy/i.test(html)
+  ) {
+    console.error(
+      `test:build — ${prefix}: metric mislabeled as model or shelf-level accuracy (R4)`,
+    );
+    process.exit(1);
+  }
+}
+
+// U5: grouped listings — 8 professional + 1 research, with the research group
+// heading present and the listing copy covering both groups.
+for (const listing of ['projects/index.html', 'id/projects/index.html']) {
+  const html = await readFile(new URL(listing, dist), 'utf8');
+  // Astro injects data-astro-cid attributes on styled elements — match the
+  // heading text regardless of the attribute noise; ampersands arrive escaped.
+  const professionalGroup = html.match(
+    /<h2[^>]*>(Professional Experience|Pengalaman Profesional)<\/h2>/,
+  );
+  const researchGroup = html.match(
+    /<h2[^>]*>(Research &amp; Experiments|Riset &amp; Eksperimen)<\/h2>/,
+  );
+  if (!professionalGroup || !researchGroup) {
+    console.error(`test:build — ${listing}: group headings missing`);
+    process.exit(1);
+  }
+  const professionalBlock = html.slice(
+    html.indexOf(professionalGroup[0]),
+    html.indexOf(researchGroup[0]),
+  );
+  const professionalCount = (professionalBlock.match(/<article class="card/g) ?? []).length;
+  const researchBlock = html.slice(html.indexOf(researchGroup[0]));
+  const researchCount = (researchBlock.match(/<article class="card/g) ?? []).length;
+  if (professionalCount !== 8 || researchCount !== 1) {
+    console.error(
+      `test:build — ${listing}: expected 8 professional + 1 research cards, found ${professionalCount} + ${researchCount}`,
+    );
+    process.exit(1);
+  }
+}
+
+// U5: employment periods — verbatim on the seven attributed entries' cards
+// and on the three Biologic case-study headers; absent on the two
+// unattributed entries.
+const periodChecks = [
+  {
+    file: 'projects/index.html',
+    mustHave: ['July 2025 – Present', 'Jun 2024 – Jun 2025', 'Jun 2023 – Jun 2024'],
+    mustNotHave: [],
+  },
+  {
+    file: 'id/projects/index.html',
+    mustHave: ['Juli 2025 – sekarang', 'Juni 2024 – Juni 2025', 'Juni 2023 – Juni 2024'],
+    mustNotHave: [],
+  },
+  { file: 'projects/sims/index.html', mustHave: ['July 2025 – Present'], mustNotHave: [] },
+  {
+    file: 'projects/clinical-lab-scheduling/index.html',
+    mustNotHave: ['July 2025', 'Jun 2024', 'Jun 2023'],
+  },
+  {
+    file: 'id/projects/clinical-lab-scheduling/index.html',
+    mustNotHave: ['Juli 2025', 'Juni 2024', 'Juni 2023'],
+  },
+];
+for (const check of periodChecks) {
+  const url = new URL(check.file, dist);
+  if (!(await exists(url))) continue; // case-study pages asserted in the U9 loop
+  const html = await readFile(url, 'utf8');
+  for (const marker of check.mustHave) {
+    if (!html.includes(marker)) {
+      console.error(`test:build — ${check.file} is missing period: ${marker}`);
+      process.exit(1);
+    }
+  }
+  for (const marker of check.mustNotHave) {
+    if (html.includes(marker)) {
+      console.error(`test:build — ${check.file} must not carry period: ${marker}`);
+      process.exit(1);
+    }
+  }
+}
+
 console.log('test:build — ok');
