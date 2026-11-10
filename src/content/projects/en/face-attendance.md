@@ -8,8 +8,10 @@ stack: [Python, TensorFlow, TensorFlow Serving, Dlib, FaceNet, Flask]
 statusKind: unverified
 ownership: employer
 disclosure: Claims come from the existing resume and are not independently re-verified; the distinction between recognition and anti-spoofing metrics is unconfirmed, and biometric data handling details are excluded.
+type: professional
 kind: compact
 order: 6
+period: Jun 2024 – Jun 2025
 ---
 
 An attendance system built on face recognition (FaceNet embeddings, Dlib) with anti-spoofing

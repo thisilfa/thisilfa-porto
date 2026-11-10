@@ -10,9 +10,11 @@ status: Staging / validasi eksperimental
 statusKind: staging
 ownership: employer
 disclosure: Data operasional asli, alur kerja proprietary, dan detail implementasi internal tidak dicantumkan.
+type: professional
 kind: case-study
 featured: true
 order: 2
+period: Juli 2025 – sekarang
 ---
 
 ## Gambaran

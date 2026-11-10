@@ -10,9 +10,11 @@ status: Staging / experimental validation
 statusKind: staging
 ownership: employer
 disclosure: Real operational data, proprietary workflows and internal implementation details are not included.
+type: professional
 kind: case-study
 featured: true
 order: 2
+period: July 2025 – Present
 ---
 
 ## Overview

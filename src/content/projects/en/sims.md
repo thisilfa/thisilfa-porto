@@ -9,9 +9,11 @@ status: Deployed in a hospital inventory environment
 statusKind: delivered
 ownership: employer
 disclosure: Certain implementation details, infrastructure configurations, internal datasets and proprietary components are excluded to respect company confidentiality.
+type: professional
 kind: case-study
 featured: true
 order: 1
+period: July 2025 – Present
 ---
 
 ## Overview

@@ -8,8 +8,10 @@ stack: [Python, YOLOv5]
 statusKind: unverified
 ownership: employer
 disclosure: Klaim berasal dari resume yang ada; definisi metrik akurasi belum terverifikasi, sehingga tidak ada angka yang dicantumkan.
+type: professional
 kind: compact
 order: 8
+period: Juni 2023 – Juni 2024
 ---
 
 Penghitungan material konstruksi secara otomatis dari citra menggunakan deteksi objek YOLOv5.

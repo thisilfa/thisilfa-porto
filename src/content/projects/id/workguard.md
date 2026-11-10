@@ -8,8 +8,10 @@ stack: [Python, YOLOv8, FastAPI, Celery, Optuna, CometML]
 statusKind: unverified
 ownership: employer
 disclosure: Klaim berasal dari resume yang ada dan tidak diverifikasi ulang secara independen; data operasional dan aturan internal tidak dicantumkan.
+type: professional
 kind: compact
 order: 5
+period: Juni 2024 – Juni 2025
 ---
 
 Deteksi pelanggaran keselamatan kerja: deteksi objek berbasis YOLOv8 atas citra lokasi, dengan

@@ -6,6 +6,7 @@ stack: [Python, Google OR-Tools, CP-SAT, FastAPI, PostgreSQL]
 statusKind: unverified
 ownership: unconfirmed
 disclosure: No role or client context is stated in the source material; scheduling rules, client data and deployment details are excluded.
+type: professional
 kind: compact
 order: 4
 ---

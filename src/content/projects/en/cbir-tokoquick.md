@@ -8,8 +8,10 @@ stack: [Python, ResNet, VGG19]
 statusKind: unverified
 ownership: employer
 disclosure: Claims come from the existing resume; no exact retrieval metric is available in the source material, so none is stated.
+type: professional
 kind: compact
 order: 7
+period: Jun 2023 – Jun 2024
 ---
 
 Content-based image retrieval (CBIR) for the TokoQuick product search: catalog and query

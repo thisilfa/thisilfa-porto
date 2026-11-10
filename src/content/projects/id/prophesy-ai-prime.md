@@ -8,9 +8,11 @@ stack: [Python, FastAPI, n8n, OpenAI API, Anthropic Claude, AnythingLLM, ChromaD
 statusKind: delivered
 ownership: employer
 disclosure: Sumber intelijen bisnis internal, prompt proprietary, dataset, dan alur kerja tidak dicantumkan.
+type: professional
 kind: case-study
 featured: true
 order: 3
+period: Juli 2025 – sekarang
 ---
 
 ## Gambaran

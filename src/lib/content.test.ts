@@ -18,6 +18,7 @@ function entry(overrides: Partial<ProjectEntry> & { id: string }): ProjectEntry 
     data: {
       title: 'Fixture Project',
       category: 'Computer Vision',
+      type: 'professional' as const,
       overview: 'A fixture overview.',
       stack: ['Python'],
       statusKind: 'delivered',
@@ -37,12 +38,18 @@ describe('projectSchema — the honesty gate', () => {
   const valid = {
     title: 'SIMS',
     category: 'Computer Vision',
+    type: 'professional' as const,
     overview: 'Inventory monitoring.',
     stack: ['Python', 'YOLOv8'],
     statusKind: 'delivered' as const,
     ownership: 'employer' as const,
     disclosure: 'Internal datasets excluded.',
     kind: 'case-study' as const,
+    period: 'July 2025 – Present',
+    contribution: [
+      { group: 'implemented' as const, items: ['YOLOv8 retraining'] },
+      { group: 'unattributed' as const, items: ['Camera setup'] },
+    ],
   };
 
   it('accepts a complete entry (happy path)', () => {
@@ -52,6 +59,24 @@ describe('projectSchema — the honesty gate', () => {
   it('rejects a case study without its disclosure note (error path)', () => {
     const { disclosure, ...withoutDisclosure } = valid;
     expect(projectSchema.safeParse(withoutDisclosure).success).toBe(false);
+  });
+
+  it('rejects a missing project type — the classification is required (error path)', () => {
+    const { type, ...withoutType } = valid;
+    expect(projectSchema.safeParse(withoutType).success).toBe(false);
+  });
+
+  it('rejects a type outside the enum (error path)', () => {
+    expect(projectSchema.safeParse({ ...valid, type: 'side-project' }).success).toBe(false);
+  });
+
+  it('rejects a contribution group outside the enum (error path)', () => {
+    expect(
+      projectSchema.safeParse({
+        ...valid,
+        contribution: [{ group: 'owned', items: ['everything'] }],
+      }).success,
+    ).toBe(false);
   });
 
   it('rejects an honesty label outside the enums (error path)', () => {
