@@ -301,4 +301,30 @@ for (const [locale, block] of Object.entries(agentCard)) {
   }
 }
 
+// U11: resume pages and the downloadable PDF. The PDF is committed and served
+// verbatim from public/ — its presence in dist is the download link's truth.
+const pdf = new URL('downloads/silfaradila-mei-resume-en.pdf', dist);
+if (!(await exists(pdf))) {
+  console.error('test:build — dist/downloads/silfaradila-mei-resume-en.pdf missing');
+  process.exit(1);
+}
+const PDF_HREF = 'href="/thisilfa-porto/downloads/silfaradila-mei-resume-en.pdf"';
+for (const [resumeFile, extra] of [
+  ['resume/index.html', []],
+  ['id/resume/index.html', ['Resume saat ini tersedia dalam bahasa Inggris']],
+]) {
+  const url = new URL(resumeFile, dist);
+  if (!(await exists(url))) {
+    console.error(`test:build — dist/${resumeFile} missing`);
+    process.exit(1);
+  }
+  const html = await readFile(url, 'utf8');
+  for (const marker of [PDF_HREF, 'Biologic Technik', 'Quick Tractor', ...extra]) {
+    if (!html.includes(marker)) {
+      console.error(`test:build — ${resumeFile} is missing: ${marker}`);
+      process.exit(1);
+    }
+  }
+}
+
 console.log('test:build — ok');

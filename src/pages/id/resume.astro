@@ -1,0 +1,290 @@
+---
+// Resume — mirror Indonesia. Pendidikan hanya ada di PDF yang diunduh (AE3).
+// PDF Bahasa Indonesia belum tersedia: halaman ini menyajikan PDF Inggris
+// dengan label yang jelas (R9).
+import Base from '../../layouts/base.astro';
+import { t } from '../../i18n/ui';
+import { withBase } from '../../lib/urls';
+
+const lang = 'id' as const;
+
+const experience = [
+  {
+    place: 'Biologic Technik Pte. Ltd.',
+    role: 'Computer Vision Engineer',
+    period: 'Computer Vision · Applied AI / LLM',
+    points: [
+      'Smart Inventory Management System — penghitungan inventaris berbasis kamera, terdeploy di lingkungan inventaris rumah sakit.',
+      'Identifikasi instrumen bedah CSSD — deteksi, embedding, similarity search (tahap staging / validasi eksperimental).',
+      'Prophesy AI Prime — pipeline RAG, integrasi LLM multi-provider, alur kerja pengumpulan otomatis.',
+    ],
+  },
+  {
+    place: 'CV. Karya Hidup Sentosa (Quick Tractor)',
+    role: 'Junior Machine Learning / Data Engineer',
+    period: 'Computer Vision · Rekayasa ML',
+    points: [
+      'WorkGuard — deteksi pelanggaran keselamatan kerja dengan YOLOv8 dan pemrosesan asinkron.',
+      'Sistem presensi wajah — pengenalan wajah dengan anti-spoofing, TensorFlow Serving.',
+      'Pencarian produk visual (CBIR) dan penghitungan material YOLOv5.',
+    ],
+  },
+];
+
+const skills = [
+  { area: 'Pemrograman', items: 'Python, SQL' },
+  { area: 'Computer Vision', items: 'OpenCV, YOLO (v5/v8), SAM' },
+  { area: 'Machine Learning', items: 'PyTorch, Scikit-learn' },
+  { area: 'AI & LLM', items: 'RAG, ChromaDB, DINOv2, CLIP' },
+  { area: 'Backend', items: 'FastAPI, Flask' },
+  { area: 'Database & Pencarian', items: 'PostgreSQL, pgvector, FAISS, Redis' },
+  { area: 'Deployment', items: 'Docker, ONNX, Linux, Raspberry Pi' },
+  { area: 'Otomasi', items: 'n8n' },
+];
+
+const selected = [
+  { name: 'Smart Inventory Management System (SIMS)', slug: 'sims' },
+  { name: 'Identifikasi Instrumen Bedah CSSD', slug: 'cssd-instrument-id' },
+  { name: 'Prophesy AI Prime', slug: 'prophesy-ai-prime' },
+];
+---
+
+<Base
+  lang={lang}
+  title={`${t(lang, 'site.name')} — ${t(lang, 'nav.resume')}`}
+  description="Resume web seorang AI Engineer: computer vision, machine learning, dan applied AI di sistem rumah sakit, keselamatan kerja, dan aplikasi LLM."
+>
+  <section class="resume">
+    <header class="head texture-grid">
+      <p class="kicker mono">{t(lang, 'nav.resume')}</p>
+      <h1>{t(lang, 'site.name')}</h1>
+      <p class="role">{t(lang, 'site.role')}</p>
+      <p class="summary">
+        AI Engineer dengan pengalaman langsung mengembangkan dan mengintegrasikan solusi machine
+        learning — pipeline computer vision di perangkat edge, aplikasi LLM dengan
+        retrieval-augmented generation, dan infrastruktur backend yang membuatnya andal.
+      </p>
+      <div class="actions">
+        <a class="cta" href={withBase('/downloads/silfaradila-mei-resume-en.pdf')} download>
+          {t(lang, 'resume.download')}
+        </a>
+        <a class="cta quiet" href={withBase('/id/contact/')}>
+          {t(lang, 'home.contactCta')}
+        </a>
+      </div>
+      <p class="lang-note">{t(lang, 'resume.englishOnly')}</p>
+    </header>
+
+    <section class="block">
+      <h2>Pengalaman kerja</h2>
+      <div class="jobs">
+        {experience.map((job) => (
+          <div class="job">
+            <div class="job-head">
+              <p class="place">{job.place}</p>
+              <p class="job-role">{job.role}</p>
+              <p class="period mono">{job.period}</p>
+            </div>
+            <ul>
+              {job.points.map((point) => (
+                <li>{point}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Proyek terpilih</h2>
+      <ul class="selected">
+        {selected.map((project) => (
+          <li>
+            <a href={withBase(`/id/projects/${project.slug}/`)}>{project.name}</a>
+          </li>
+        ))}
+      </ul>
+      <p class="more">
+        Riwayat lengkap di <a href={withBase('/id/projects/')}>halaman proyek</a> — sembilan proyek
+        profesional dengan label status yang jujur.
+      </p>
+    </section>
+
+    <section class="block">
+      <h2>Keahlian teknis</h2>
+      <div class="skills">
+        {skills.map((group) => (
+          <div class="skill">
+            <p class="mono area">{group.area}</p>
+            <p>{group.items}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  </section>
+</Base>
+
+<style>
+  .resume {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-8) var(--container-pad) var(--space-9);
+  }
+
+  .head {
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: var(--space-6);
+    margin-bottom: var(--space-7);
+  }
+
+  .kicker {
+    color: var(--neon-magenta);
+    font-size: var(--text-xs);
+    letter-spacing: 0.18em;
+    margin-bottom: var(--space-3);
+  }
+
+  h1 {
+    font-size: var(--text-3xl);
+  }
+
+  .role {
+    color: var(--neon-violet);
+    font-size: var(--text-sm);
+    margin-top: var(--space-2);
+  }
+
+  .summary {
+    max-width: 64ch;
+    margin-top: var(--space-4);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+  }
+
+  .lang-note {
+    margin-top: var(--space-3);
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .cta {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--surface-0);
+    background: var(--neon-magenta);
+    border-radius: var(--radius-pill);
+    padding: var(--space-2) var(--space-5);
+    text-decoration: none;
+    transition: box-shadow var(--transition-fast);
+  }
+
+  .cta:hover {
+    box-shadow: var(--glow-magenta);
+  }
+
+  .cta.quiet {
+    color: var(--text-body);
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+  }
+
+  .cta.quiet:hover {
+    color: var(--text-high);
+    box-shadow: var(--glow-violet);
+  }
+
+  .block {
+    margin-top: var(--space-7);
+  }
+
+  .block h2 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .jobs {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .job {
+    border-left: 2px solid var(--border-subtle);
+    padding-left: var(--space-5);
+  }
+
+  .place {
+    color: var(--text-high);
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
+
+  .job-role {
+    color: var(--neon-magenta);
+    font-size: var(--text-sm);
+    margin-top: var(--space-1);
+  }
+
+  .period {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    margin-top: var(--space-1);
+  }
+
+  .job ul {
+    margin-top: var(--space-3);
+    padding-left: var(--space-5);
+    display: grid;
+    gap: var(--space-2);
+    max-width: 70ch;
+  }
+
+  .job li {
+    font-size: var(--text-sm);
+  }
+
+  .selected {
+    padding-left: var(--space-5);
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .more {
+    margin-top: var(--space-3);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .skills {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 640px) {
+    .skills {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .skill {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .skill .area {
+    color: var(--neon-violet);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-1);
+  }
+
+  .skill p:last-child {
+    font-size: var(--text-sm);
+  }
+</style>
