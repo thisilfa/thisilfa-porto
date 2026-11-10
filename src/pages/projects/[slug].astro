@@ -6,6 +6,7 @@ import Base from '../../layouts/base.astro';
 import { t } from '../../i18n/ui';
 import { assertLocalePairing, getByLocale } from '../../lib/content';
 import { withBase } from '../../lib/urls';
+import { diagramFor } from '../../lib/diagrams';
 
 const lang = 'en' as const;
 
@@ -22,6 +23,7 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const d = entry.data;
+const Diagram = diagramFor(d.diagram, lang);
 ---
 
 <Base lang={lang} title={`${d.title} — ${t(lang, 'site.name')}`} description={d.overview}>
@@ -66,6 +68,22 @@ const d = entry.data;
           ),
         )}
       </section>
+    )}
+
+    {Diagram && (
+      <figure class="diagram">
+        <Diagram
+          lang={lang}
+          title={t(lang, 'diagram.sims.title')}
+          desc={t(lang, 'diagram.sims.desc')}
+          legend={{
+            implemented: t(lang, 'diagram.legend.implemented'),
+            integration: t(lang, 'diagram.legend.integration'),
+            context: t(lang, 'diagram.legend.context'),
+          }}
+          scrollHint={t(lang, 'diagram.scrollHint')}
+        />
+      </figure>
     )}
 
     <div class="prose">
