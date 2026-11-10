@@ -15,6 +15,7 @@ export interface CardEntry {
     ownership: 'employer' | 'independent' | 'unconfirmed';
     disclosure: string;
     kind: 'case-study' | 'compact';
+    period?: string;
   };
 }
 
@@ -32,6 +33,7 @@ const isCaseStudy = entry.data.kind === 'case-study';
     <h3>{isCaseStudy ? <a href={href}>{entry.data.title}</a> : entry.data.title}</h3>
     <p class="meta mono">
       <span class="category">{entry.data.category}</span>
+      {entry.data.period && <span class="period">{entry.data.period}</span>}
       <span class="status status-{entry.data.statusKind}">{entry.data.statusKind}</span>
     </p>
   </header>
@@ -88,6 +90,10 @@ const isCaseStudy = entry.data.kind === 'case-study';
     color: var(--text-muted);
     letter-spacing: 0.08em;
     text-transform: uppercase;
+  }
+
+  .period {
+    color: var(--text-muted);
   }
 
   .status {
