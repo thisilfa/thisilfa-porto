@@ -8,8 +8,10 @@ stack: [Python, TensorFlow, TensorFlow Serving, Dlib, FaceNet, Flask]
 statusKind: unverified
 ownership: employer
 disclosure: Klaim berasal dari resume yang ada dan tidak diverifikasi ulang secara independen; pembeda metrik pengenalan dan anti-spoofing belum terkonfirmasi, dan detail penanganan data biometrik tidak dicantumkan.
+type: professional
 kind: compact
 order: 6
+period: Juni 2024 – Juni 2025
 ---
 
 Sistem presensi berbasis pengenalan wajah (embedding FaceNet, Dlib) dengan pemeriksaan

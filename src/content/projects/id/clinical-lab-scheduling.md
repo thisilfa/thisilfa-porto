@@ -6,6 +6,7 @@ stack: [Python, Google OR-Tools, CP-SAT, FastAPI, PostgreSQL]
 statusKind: unverified
 ownership: unconfirmed
 disclosure: Peran dan konteks klien tidak disebutkan dalam materi sumber; aturan penjadwalan, data klien, dan detail deployment tidak dicantumkan.
+type: professional
 kind: compact
 order: 4
 ---

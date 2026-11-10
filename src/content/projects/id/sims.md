@@ -9,9 +9,11 @@ status: Terdeploy di lingkungan inventaris rumah sakit
 statusKind: delivered
 ownership: employer
 disclosure: Beberapa detail implementasi, konfigurasi infrastruktur, dataset internal, dan komponen proprietary tidak dicantumkan demi menjaga kerahasiaan perusahaan.
+type: professional
 kind: case-study
 featured: true
 order: 1
+period: Juli 2025 – sekarang
 ---
 
 ## Gambaran

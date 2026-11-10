@@ -8,6 +8,8 @@ import { z } from 'astro/zod';
 export const projectSchema = z.object({
   title: z.string(),
   category: z.string(),
+  /** Project classification (origin R7): professional / independent / research. */
+  type: z.enum(['professional', 'independent', 'research']),
   overview: z.string(),
   role: z.string().optional(),
   company: z.string().optional(),
@@ -19,6 +21,22 @@ export const projectSchema = z.object({
   kind: z.enum(['case-study', 'compact']),
   featured: z.boolean().default(false),
   order: z.number().default(99),
+  /** Employment period, verbatim from the resume — never project windows. */
+  period: z.string().optional(),
+  /**
+   * Contribution split per the improvement guide §5.4: implemented /
+   * contributed / proposed / unattributed. Locale-native text per entry.
+   */
+  contribution: z
+    .array(
+      z.object({
+        group: z.enum(['implemented', 'contributed', 'proposed', 'unattributed']),
+        items: z.array(z.string()).min(1),
+      }),
+    )
+    .optional(),
+  /** Slug of the architecture diagram component rendered by the case-study page. */
+  diagram: z.string().optional(),
 });
 
 export type ProjectData = z.infer<typeof projectSchema>;

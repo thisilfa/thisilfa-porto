@@ -6,6 +6,7 @@ stack: []
 statusKind: research
 ownership: unconfirmed
 disclosure: Exploratory research only — the source material documents context and involvement, not an implementation.
+type: research
 kind: compact
 order: 9
 ---

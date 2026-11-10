@@ -6,6 +6,7 @@ stack: []
 statusKind: research
 ownership: unconfirmed
 disclosure: Hanya riset eksploratif — materi sumber mendokumentasikan konteks dan keterlibatan, bukan sebuah implementasi.
+type: research
 kind: compact
 order: 9
 ---
