@@ -12,7 +12,7 @@ import DiagramSims from '../components/diagram-sims.astro';
 
 const diagrams = { sims: DiagramSims };
 
-export function diagramFor(key, lang) {
+export function diagramFor(key) {
   if (!key) return null;
-  return diagrams[key]?.[lang] ?? null;
+  return diagrams[key] ?? null;
 }
