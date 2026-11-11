@@ -25,12 +25,14 @@ export const projectSchema = z.object({
   period: z.string().optional(),
   /**
    * Contribution split per the improvement guide §5.4: implemented /
-   * contributed / proposed / unattributed. Locale-native text per entry.
+   * contributed / unattributed (three-group model, owner decision
+   * 2026-11-11 — designed-and-proposed work consolidates into implemented).
+   * Locale-native text per entry.
    */
   contribution: z
     .array(
       z.object({
-        group: z.enum(['implemented', 'contributed', 'proposed', 'unattributed']),
+        group: z.enum(['implemented', 'contributed', 'unattributed']),
         items: z.array(z.string()).min(1),
       }),
     )

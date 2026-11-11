@@ -24,17 +24,17 @@ contribution:
       - Pemrosesan antrian tugas berbasis Redis.
       - Pemantauan deteksi harian dan tinjauan ketidaksesuaian.
       - Pengumpulan data tertarget untuk kegagalan overexposed dan kotak teroklusi.
+      - Merancang dan mengimplementasikan arsitektur inferensi terpusat, menggantikan duplikasi
+        pemuatan YOLO per perangkat.
   - group: contributed
     items:
       - Deployment AWS, berkolaborasi dengan tim infrastruktur.
       - Integrasi MQTT dengan infrastruktur yang sudah ada.
       - Integrasi layanan inferensi computer vision ke sistem inventaris yang lebih luas.
-  - group: proposed
-    items:
-      - Arsitektur inferensi terpusat yang menggantikan duplikasi pemuatan YOLO per perangkat.
   - group: unattributed
     items:
       - Penyiapan kamera dan akuisisi citra; frontend, dashboard, dan lapisan pelaporan.
+      - Penyimpanan Amazon S3 — bagian dari sistem yang lebih luas, bukan implementasi pribadi.
 ---
 
 ## Masalah dan kendala
@@ -58,15 +58,16 @@ Kendala yang membentuk solusinya:
 
 ## Arsitektur sistem
 
-Diagram di atas menunjukkan alur umumnya. Kamera di rak mengirim citra ke perangkat edge
-(Raspberry Pi 4) yang mengambil gambar rak secara berkala dan saat perubahan terdeteksi.
-Segmentasi YOLOv8 mengidentifikasi permukaan kotak bertumpuk yang terlihat, dan logika
-penghitungan berbasis geometri memperkirakan jumlah total — termasuk kotak yang tidak dapat
+Diagram di atas menunjukkan alur umumnya. Tujuh kamera di tujuh rak mengirim citra ke empat
+perangkat Raspberry Pi 4 yang mengambil gambar rak setiap 30 menit dan saat peristiwa
+perubahan jumlah terdeteksi. Segmentasi YOLOv8 mengidentifikasi permukaan kotak bertumpuk
+yang terlihat, dan penghitungan berbasis geometri dan penalaran spasial — secara eksplisit
+bukan rekonstruksi 3D penuh — memperkirakan jumlah total, termasuk kotak yang tidak dapat
 dilihat langsung. Layanan inferensi FastAPI dengan pemrosesan antrian berbasis Redis menangani
 alur kerja inferensi dan menyerahkan hasilnya ke sistem inventaris. MQTT menghubungkan
-perangkat ke infrastruktur yang ada, dan tier cloud berjalan di AWS. Tahapan bergaris putus-
-putus dan redup menandai komponen milik tim lain atau yang tidak teratribusi individual;
-tahapan solid adalah yang saya implementasikan.
+perangkat ke infrastruktur yang ada, dan tier cloud berjalan di AWS, tempat pendekatan
+inferensi terpusat dituju. Tahapan bergaris putus-putus dan redup menandai komponen milik tim
+lain atau yang tidak teratribusi individual; tahapan solid adalah yang saya implementasikan.
 
 ## Implementasi teknis
 
@@ -84,10 +85,16 @@ sementara inferensi berjalan di perangkat keras yang lebih kuat, dengan pemroses
 berbasis Redis antara pengambilan dan inferensi. Hasil: beban edge berkurang dan ada satu
 tempat terpusat untuk memantau perilaku model.
 
-**Siklus hidup model.** Retraining dan evaluasi adalah praktik harian: performa dipantau
-terhadap ketidaksesuaian yang ditinjau, dan kegagalan dikategorikan sebagai terkait model,
-terkait logika penghitungan, atau lingkungan (misalnya oklusi atau overexposure) sebelum ada
-perbaikan dicoba.
+**Siklus hidup model dan data.** Retraining dan evaluasi adalah praktik harian: performa
+dipantau terhadap ketidaksesuaian yang ditinjau, dan kegagalan dikategorikan sebagai terkait
+model, terkait logika penghitungan, atau lingkungan (misalnya oklusi atau overexposure)
+sebelum ada perbaikan dicoba. Dataset terdokumentasi: kurang dari 500 citra (sekitar 800
+"instance" anotasi — makna tepat dari angka itu belum terkonfirmasi), dianotasi di Roboflow,
+dengan ketidakseimbangan kelas ditangani saat preparasi. Augmentasi mencakup rotasi,
+pembalikan, perubahan brightness/contrast dan exposure, plus random cutout selektif pada
+kurang dari 3% data pelatihan. Pelatihan memantau loss dan mAP; pengujian mencakup evaluasi
+segmentation-mask, mask mAP, presisi, dan confusion matrix. Skor model-level yang tepat tidak
+tersedia.
 
 ## Eksperimen dan tantangan rekayasa
 
@@ -98,24 +105,26 @@ perbaikan dicoba.
   dicoba setelah kategorisasi, sehingga retraining model tidak menutupi kesalahan logika
   penghitungan.
 - **Kegagalan overexposure dan oklusi.** Rak tertentu gagal di jam-jam yang bisa diprediksi
-  (pencahayaan) dan pada menara yang tersusun rapat. Eksperimen: pengumpulan tertarget sampel
-  overexposed dan teroklusi, diikuti augmentasi dan penyempurnaan logika penghitungan.
-  Observasi: deteksi pada rak yang sebelumnya gagal pulih; kesalahan tersisa mengelompok di
-  oklusi ekstrem. Keputusan: pertahankan inferensi berbasis geometri alih-alih mengejar
-  dataset sepenuhnya terlihat yang tidak mungkin diberikan lingkungan ini.
-- **Ketidakstabilan edge.** Pemuatan YOLO yang duplikat di perangkat Raspberry Pi menghasilkan
-  ketidakstabilan di bawah beban. Eksperimen: arsitektur inferensi terpusat (di atas).
-  Observasi: beban edge turun menjadi pengambilan dan pengiriman citra. Keputusan: diadopsi,
-  dengan usulan didokumentasikan dan dibagikan ke tim.
+  (pencahayaan) dan pada menara yang tersusun rapat. Tindakan terdokumentasi: pengumpulan
+  tertarget sampel overexposed dan teroklusi, diikuti augmentasi dan penyempurnaan logika
+  penghitungan. Dokumentasi mencatat tindakan-tindakan ini; ia tidak mencatat efek terukurnya
+  pada rak yang gagal, sehingga tidak ada klaim pemulihan di sini.
+- **Ketidakstabilan edge.** Satu Raspberry Pi menjalankan program yang sama dua kali untuk dua
+  kamera, memuat YOLO dua kali dan berkontribusi pada inefisiensi sumber daya serta crash.
+  Tindakan terdokumentasi: usulan untuk memindahkan inferensi ke server yang di-host di AWS
+  sementara perangkat Pi menangkap dan mengirim citra — dengan server inferensi FastAPI,
+  integrasi YOLO, dan pemrosesan antrian Redis diimplementasikan sendiri. Dokumentasi tidak
+  mencatat adopsi usulan tersebut maupun efek terukurnya, sehingga keduanya tidak diklaim.
 
 ## Hasil dan evaluasi
 
 Akurasi penghitungan harian rata-rata puncak sebesar 98,6% pada Oktober, diukur dengan
 membandingkan jumlah inventaris hasil deteksi terhadap kuantitas inventaris aktual. Ini adalah
 metrik penghitungan operasional — jumlah item versus inventaris aktual — bukan angka akurasi
-model. Di luar metrik: terdeploy di beberapa perangkat Raspberry Pi, mendukung pemantauan
-multi-kamera dan pengisian otomatis berkala (PAR), dengan laporan bulanan mencakup akurasi,
-performa PAR, kategori kegagalan, dan perbaikan.
+model; tahun pelaporan Oktober tersebut belum terkonfirmasi. Di luar metrik: terdeploy di
+beberapa perangkat Raspberry Pi, mendukung pemantauan multi-kamera dan pengisian otomatis
+berkala (PAR), dengan laporan bulanan mencakup akurasi, performa PAR, kategori kegagalan, dan
+perbaikan.
 
 ## Demonstration dan bukti
 
@@ -124,13 +133,16 @@ menunggu materi yang disetujui pemilik dan sengaja tidak dipalsukan di sini.
 
 ## Batasan dan refleksi
 
-- Angka 98,6% menggambarkan penghitungan operasional pada rak yang terdeploy pada Oktober;
-  angka ini tidak digeneralisasi ke lingkungan yang belum terlihat, dan citra serta dataset di
-  baliknya bersifat internal dan tidak dibuka.
-- Penyiapan kamera, frontend, dan lapisan pelaporan dimiliki tim lain dan tidak dijelaskan di
-  sini.
-- Yang akan saya teliti selanjutnya: apakah kesalahan oklusi ekstrem yang tersisa lebih baik
-  dilayani sensor depth daripada menambah data pelatihan RGB.
+- Angka 98,6% menggambarkan penghitungan operasional pada rak yang terdeploy pada Oktober
+  (tahun pelaporannya belum terkonfirmasi); angka ini tidak digeneralisasi ke lingkungan yang
+  belum terlihat, dan citra serta dataset di baliknya bersifat internal dan tidak dibuka.
+- Penyiapan kamera, frontend, dan lapisan pelaporan tidak teratribusi individual dalam studi
+  kasus ini dan tidak dijelaskan di sini.
+- Apakah usulan inferensi terpusat diadopsi di produksi tidak terdokumentasi; kontribusi yang
+  terdokumentasi adalah usulannya serta server FastAPI, integrasi YOLO, dan pemrosesan antrian
+  Redis yang diimplementasikan sendiri.
+- Investigasi selanjutnya, belum dilakukan: apakah kesalahan oklusi ekstrem yang tersisa lebih
+  baik dilayani sensor depth daripada menambah data pelatihan RGB.
 
 ## Catatan disclosure
 

@@ -29,7 +29,7 @@ const research = projects.filter((entry) => entry.data.type === 'research');
       <h2>{t(lang, 'projects.groups.professional')}</h2>
       <div class="grid">
         {professional.map((entry) => (
-          <ProjectCard entry={{ slug: entrySlug(entry.id), data: entry.data }} />
+          <ProjectCard locale="id" entry={{ slug: entrySlug(entry.id), data: entry.data }} />
         ))}
       </div>
     </section>
@@ -38,7 +38,7 @@ const research = projects.filter((entry) => entry.data.type === 'research');
         <h2>{t(lang, 'projects.groups.research')}</h2>
         <div class="grid">
           {research.map((entry) => (
-            <ProjectCard entry={{ slug: entrySlug(entry.id), data: entry.data }} />
+            <ProjectCard locale="id" entry={{ slug: entrySlug(entry.id), data: entry.data }} />
           ))}
         </div>
       </section>

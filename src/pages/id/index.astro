@@ -80,7 +80,7 @@ const journey = [
     <div class="grid">
       {featured.length === 0 && <p class="empty">{t(lang, 'home.featuredEmpty')}</p>}
       {featured.map((entry) => (
-        <ProjectCard entry={{ slug: entrySlug(entry.id), data: entry.data }} />
+        <ProjectCard locale="id" entry={{ slug: entrySlug(entry.id), data: entry.data }} />
       ))}
     </div>
   </section>

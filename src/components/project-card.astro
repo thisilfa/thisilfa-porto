@@ -20,11 +20,13 @@ export interface CardEntry {
 }
 
 interface Props {
+  /** The listing's locale — cards link into that locale's route tree. */
+  locale: 'en' | 'id';
   entry: CardEntry;
 }
 
-const { entry } = Astro.props;
-const href = withBase(`/projects/${entry.slug}/`);
+const { locale, entry } = Astro.props;
+const href = withBase(locale === 'id' ? `/id/projects/${entry.slug}/` : `/projects/${entry.slug}/`);
 const isCaseStudy = entry.data.kind === 'case-study';
 ---
 
