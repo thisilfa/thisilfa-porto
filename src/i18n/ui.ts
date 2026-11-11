@@ -68,9 +68,17 @@ const en = {
   'contribution.contributed': 'I contributed to',
   'contribution.unattributed': 'Not individually attributed',
   'projects.contribution': 'My contribution',
+  'projects.onPage': 'On this page',
+  'projects.readCaseStudy': 'Read the case study',
   'diagram.sims.title': 'SIMS architecture — generalized flow',
   'diagram.sims.desc':
     'Cameras on shelves feed edge devices; YOLOv8 segmentation and counting logic run in a FastAPI inference service with Redis queueing, producing inventory results. MQTT and AWS are integration points owned by the infrastructure team.',
+  'diagram.cssd.title': 'CSSD pipeline — generalized flow',
+  'diagram.cssd.desc':
+    'YOLO detection, crop preprocessing, SAM mask refinement, geometric length estimation with px-to-cm calibration, candidate filtering against instrument metadata, and DINOv2 embedding retrieval over FAISS and pgvector. The reference metadata is context whose provenance is not attributed.',
+  'diagram.prophesy.title': 'Prophesy AI Prime — three parts, generalized flow',
+  'diagram.prophesy.desc':
+    'An n8n market-sensing workflow feeding PostgreSQL through OpenAI extraction and relevance filtering; a website RAG assistant over FastAPI, AnythingLLM and ChromaDB with user-selected OpenAI or Claude models; and a custom SQL agent over a read-only PostgreSQL account. The downstream forecasting stage is owned by another contributor.',
   'diagram.legend.implemented': 'Implemented',
   'diagram.legend.integration': 'Contributed / integration',
   'diagram.legend.context': 'Context — not individually attributed',
@@ -125,9 +133,17 @@ const id: Record<keyof typeof en, string> = {
   'contribution.contributed': 'Saya berkontribusi dalam',
   'contribution.unattributed': 'Tidak teratribusi individual',
   'projects.contribution': 'Kontribusi saya',
+  'projects.onPage': 'Di halaman ini',
+  'projects.readCaseStudy': 'Baca studi kasus',
   'diagram.sims.title': 'Arsitektur SIMS — alur umum',
   'diagram.sims.desc':
     'Kamera di rak mengirim citra ke perangkat edge; segmentasi YOLOv8 dan logika penghitungan berjalan di layanan inferensi FastAPI dengan antrian Redis, menghasilkan data inventaris. MQTT dan AWS adalah titik integrasi milik tim infrastruktur.',
+  'diagram.cssd.title': 'Pipeline CSSD — alur umum',
+  'diagram.cssd.desc':
+    'Deteksi YOLO, pra-pemrosesan crop, penyempurnaan mask SAM, estimasi panjang geometris dengan kalibrasi piksel-ke-sentimeter, penyaringan kandidat terhadap metadata instrumen, dan retrieval embedding DINOv2 melalui FAISS dan pgvector. Metadata referensi adalah konteks yang provenansnya tidak teratribusi.',
+  'diagram.prophesy.title': 'Prophesy AI Prime — tiga bagian, alur umum',
+  'diagram.prophesy.desc':
+    'Alur kerja market sensing n8n yang mengisi PostgreSQL melalui ekstraksi OpenAI dan penyaringan relevansi; asisten RAG website di atas FastAPI, AnythingLLM dan ChromaDB dengan model OpenAI atau Claude pilihan pengguna; dan SQL agent kustom atas akun PostgreSQL read-only. Tahap forecasting hilir dimiliki kontributor lain.',
   'diagram.legend.implemented': 'Diimplementasikan',
   'diagram.legend.integration': 'Kontribusi / integrasi',
   'diagram.legend.context': 'Konteks — tidak teratribusi individual',

@@ -17,10 +17,10 @@ import { withBase } from '../lib/urls';
     <p class="body">{t('en', 'notfound.body')}</p>
     <p class="body">{t('id', 'notfound.body')}</p>
     <div class="ways">
-      <a class="cta" href={withBase('/')}>
+      <a class="btn btn-primary" href={withBase('/')}>
         {t('en', 'notfound.home.en')}
       </a>
-      <a class="cta quiet" href={withBase('/id/')}>
+      <a class="btn btn-quiet" href={withBase('/id/')}>
         {t('en', 'notfound.home.id')}
       </a>
     </div>
@@ -57,31 +57,5 @@ import { withBase } from '../lib/urls';
     flex-wrap: wrap;
     gap: var(--space-3);
     margin-top: var(--space-3);
-  }
-
-  .cta {
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    text-decoration: none;
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-pill);
-    padding: var(--space-2) var(--space-5);
-    transition:
-      box-shadow var(--transition-fast),
-      color var(--transition-fast);
-  }
-
-  .cta:hover {
-    box-shadow: var(--glow-magenta);
-  }
-
-  .cta.quiet {
-    color: var(--text-body);
-    border-color: var(--border-subtle);
-  }
-
-  .cta.quiet:hover {
-    color: var(--text-high);
-    box-shadow: var(--glow-violet);
   }
 </style>

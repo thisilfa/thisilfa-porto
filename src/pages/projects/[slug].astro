@@ -21,9 +21,10 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
 const d = entry.data;
 const Diagram = diagramFor(d.diagram);
+const onPage = headings.filter((h) => h.depth === 2);
 ---
 
 <Base lang={lang} title={`${d.title} — ${t(lang, 'site.name')}`} description={d.overview}>
@@ -74,8 +75,8 @@ const Diagram = diagramFor(d.diagram);
       <figure class="diagram">
         <Diagram
           lang={lang}
-          title={t(lang, 'diagram.sims.title')}
-          desc={t(lang, 'diagram.sims.desc')}
+          title={d.diagram ? t(lang, `diagram.${d.diagram}.title` as never) : ''}
+          desc={d.diagram ? t(lang, `diagram.${d.diagram}.desc` as never) : ''}
           legend={{
             implemented: t(lang, 'diagram.legend.implemented'),
             integration: t(lang, 'diagram.legend.integration'),
@@ -84,6 +85,21 @@ const Diagram = diagramFor(d.diagram);
           scrollHint={t(lang, 'diagram.scrollHint')}
         />
       </figure>
+    )}
+
+    {onPage.length > 0 && (
+      <nav class="on-page" aria-label={t(lang, 'projects.onPage')}>
+        <span class="mono on-page-label">{t(lang, 'projects.onPage')}</span>
+        <ul>
+          {onPage.map((heading) => (
+            <li>
+              <a class="mono" href={`#${heading.slug}`}>
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
     )}
 
     <div class="prose">
