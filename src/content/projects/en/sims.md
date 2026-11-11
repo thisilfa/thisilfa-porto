@@ -24,17 +24,17 @@ contribution:
       - Redis-based task queue processing.
       - Daily detection monitoring and discrepancy review.
       - Targeted data collection addressing overexposed and occluded-box failures.
+      - Designed and implemented the centralized inference architecture, replacing duplicate
+        per-device YOLO loading.
   - group: contributed
     items:
       - AWS deployment, in collaboration with the infrastructure engineers.
       - MQTT integration with the existing infrastructure.
       - Integration of the computer vision inference service into the broader inventory system.
-  - group: proposed
-    items:
-      - The centralized inference architecture that replaced duplicate per-device YOLO loading.
   - group: unattributed
     items:
       - Camera setup and image acquisition; frontend, dashboard, and reporting layer.
+      - Amazon S3 storage — part of the wider system, not personally implemented.
 ---
 
 ## Problem and constraints
@@ -58,14 +58,16 @@ The constraints that shaped the solution:
 
 ## System architecture
 
-The diagram above shows the generalized flow. Cameras over the shelves feed edge devices
-(Raspberry Pi 4) that capture shelf images periodically and on detected change. YOLOv8
-segmentation identifies the visible surfaces of stacked boxes, and geometry-based counting
-logic estimates the full count — including the boxes it cannot directly see. A FastAPI
-inference service with Redis-based queue processing handles the inference workflow and hands
-results to the inventory system. MQTT connects the devices to the existing infrastructure, and
-the cloud tier runs on AWS. The dashed and muted stages mark components owned by other teams
-or not individually attributed; the solid stages are the ones I implemented.
+The diagram above shows the generalized flow. Seven cameras across seven shelves feed four
+Raspberry Pi 4 devices that capture shelf images every 30 minutes and on quantity-change
+events. YOLOv8 segmentation identifies the visible surfaces of stacked boxes, and geometry-
+and spatial-reasoning-based counting — explicitly not a full 3D reconstruction — estimates
+the full count, including the boxes it cannot directly see. A FastAPI inference service with
+Redis-based queue processing handles the inference workflow and hands results to the
+inventory system. MQTT connects the devices to the existing infrastructure, and the cloud
+tier runs on AWS, where the centralized inference approach was pointed. The dashed and muted
+stages mark components owned by other teams or not individually attributed; the solid stages
+are the ones I implemented.
 
 ## Technical implementation
 
@@ -82,10 +84,16 @@ and implemented personally — so edge devices capture and stream while inferenc
 stronger hardware, with Redis-based queue processing between capture and inference. Outcome:
 relief for the edge devices and a single place to monitor model behavior.
 
-**Model lifecycle.** Retraining and evaluation were daily practice: performance was monitored
-against reviewed discrepancies, and failures were categorized as model-related,
+**Model lifecycle and data.** Retraining and evaluation were daily practice: performance was
+monitored against reviewed discrepancies, and failures were categorized as model-related,
 counting-logic-related, or environmental (for example occlusion or overexposure) before any
-fix was attempted.
+fix was attempted. The documented dataset: fewer than 500 images (roughly 800 annotation
+"instances" — the exact meaning of that count is unconfirmed), annotated in Roboflow, with
+class imbalance addressed during preparation. Augmentations included rotation, flipping,
+brightness/contrast and exposure changes, plus selective random cutout on less than 3% of
+the training data. Training monitored loss and mAP; testing covered segmentation-mask
+evaluation, mask mAP, precision, and a confusion matrix. Exact model-level scores are not
+available.
 
 ## Experiments and engineering challenges
 
@@ -95,24 +103,26 @@ fix was attempted.
   Decision: fixes were attempted only after categorization, so model retraining did not mask
   counting-logic errors.
 - **Overexposure and occlusion failures.** Certain shelves failed at predictable times of day
-  (lighting) and on tightly stacked towers. Experiment: targeted collection of overexposed and
-  occluded samples, followed by augmentation and counting-logic refinements. Observation:
-  detection on the previously failing shelves recovered; remaining errors clustered in extreme
-  occlusion. Decision: keep the geometry-based inference rather than chasing a fully visible
-  training set that the environment cannot provide.
-- **Edge instability.** Duplicate YOLO loading on the Raspberry Pi devices produced
-  instability under load. Experiment: the centralized inference architecture (above).
-  Observation: edge load dropped to capture and streaming. Decision: adopted, with the
-  proposal documented and shared with the team.
+  (lighting) and on tightly stacked towers. Documented actions: targeted collection of
+  overexposed and occluded samples, followed by augmentation and counting-logic refinements.
+  The documentation records these actions; it does not record their measured effect on the
+  failing shelves, so no recovery claim is made here.
+- **Edge instability.** One Raspberry Pi ran the same program twice for two cameras, loading
+  YOLO twice and contributing to resource inefficiency and crashes. Documented action: a
+  proposal to move inference to an AWS-hosted server while the Pi devices capture and send
+  images — with the FastAPI inference server, YOLO integration, and Redis task processing
+  personally implemented. The documentation does not record the proposal's adoption or its
+  measured effect, so none is claimed.
 
 ## Results and evaluation
 
 Peak average daily item-counting correctness of 98.6% in October, measured by comparing
 detected inventory counts against actual inventory quantities. This is an operational
-counting metric — item counts versus actual inventory — not a model accuracy figure. Beyond
-the metric: deployed across multiple Raspberry Pi devices, supporting multi-camera monitoring
-and periodic automatic replenishment (PAR), with monthly reports covering accuracy, PAR
-performance, failure categories, and improvements.
+counting metric — item counts versus actual inventory — not a model accuracy figure; the
+year of the October reporting is unconfirmed. Beyond the metric: deployed across multiple
+Raspberry Pi devices, supporting multi-camera monitoring and periodic automatic replenishment
+(PAR), with monthly reports covering accuracy, PAR performance, failure categories, and
+improvements.
 
 ## Demonstration and evidence
 
@@ -121,13 +131,16 @@ owner-approved material and are intentionally not faked here.
 
 ## Limitations and reflection
 
-- The 98.6% figure describes operational counting on the deployed shelves in October; it does
-  not generalize to unseen environments, and the underlying images and datasets are internal
-  and undisclosed.
-- Camera setup, the frontend, and the reporting layer were owned by other teams and are not
-  described here.
-- What I would investigate next: whether the remaining extreme-occlusion errors are better
-  served by depth sensors than by more RGB training data.
+- The 98.6% figure describes operational counting on the deployed shelves in October (the
+  reporting year is unconfirmed); it does not generalize to unseen environments, and the
+  underlying images and datasets are internal and undisclosed.
+- Camera setup, the frontend, and the reporting layer are not individually attributed in this
+  case study and are not described here.
+- Whether the centralized inference proposal was adopted in production is not documented; the
+  documented contributions are the proposal itself and the personally implemented FastAPI
+  server, YOLO integration, and Redis task processing.
+- Future investigation, not yet performed: whether the remaining extreme-occlusion errors are
+  better served by depth sensing than by additional RGB training data.
 
 ## Disclosure note
 

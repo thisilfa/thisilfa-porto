@@ -249,6 +249,24 @@ for (const listing of ['projects/index.html', 'id/projects/index.html']) {
     console.error(`test:build — ${listing}: expected 9 disclosure notes, found ${disclosures}`);
     process.exit(1);
   }
+
+  // Review regression gate (owner review, 2026-11-11): every link inside any
+  // card on the ID listing points into /id/ — compact cards (no case-study
+  // page) carry no link at all.
+  if (listing.startsWith('id/')) {
+    const cardFragments = html
+      .split('<article class="card')
+      .slice(1)
+      .map((f) => f.split('</article>')[0]);
+    for (const fragment of cardFragments) {
+      const hrefs = [...fragment.matchAll(/href="([^"]*)"/g)].map((m) => m[1]);
+      const bad = hrefs.filter((href) => !href.startsWith('/thisilfa-porto/id/'));
+      if (bad.length > 0) {
+        console.error(`test:build — ${listing}: card links outside /id/: ${bad.join(', ')}`);
+        process.exit(1);
+      }
+    }
+  }
 }
 
 for (const compact of [
@@ -358,12 +376,7 @@ for (const prefix of ['projects/sims/', 'id/projects/sims/']) {
   }
   const groupLabels = prefix.startsWith('id/')
     ? // HTML escapes ampersands, so these match the unescaped fragments.
-      [
-        'Saya mengimplementasikan',
-        'Saya berkontribusi dalam',
-        'Dirancang',
-        'Tidak teratribusi individual',
-      ]
+      ['Saya mengimplementasikan', 'Saya berkontribusi dalam', 'Tidak teratribusi individual']
     : ['I implemented', 'I contributed to', 'Designed', 'Not individually attributed'];
   for (const label of groupLabels) {
     if (!contribution.includes(label)) {
