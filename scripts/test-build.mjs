@@ -410,22 +410,24 @@ for (const prefix of ['projects/sims/', 'id/projects/sims/']) {
     process.exit(1);
   }
 
-  // The metric: exactly one legal state (R4).
-  const state = metricState(html);
-  if (state === 'ILLEGAL') {
-    console.error(
-      `test:build — ${prefix}: metric figure appears without its decided definition (R4)`,
-    );
-    process.exit(1);
-  }
-  if (
-    /model accuracy|model accuracy figure|akurasi model|shelf-level/i.test(html) &&
-    !/not a model accuracy/i.test(html)
-  ) {
-    console.error(
-      `test:build — ${prefix}: metric mislabeled as model or shelf-level accuracy (R4)`,
-    );
-    process.exit(1);
+  // The metric: exactly one legal state (R4) — SIMS's decided sentence only.
+  if (prefix.includes('sims')) {
+    const state = metricState(html);
+    if (state === 'ILLEGAL') {
+      console.error(
+        `test:build — ${prefix}: metric figure appears without its decided definition (R4)`,
+      );
+      process.exit(1);
+    }
+    if (
+      /model accuracy|model accuracy figure|akurasi model|shelf-level/i.test(html) &&
+      !/not a model accuracy/i.test(html)
+    ) {
+      console.error(
+        `test:build — ${prefix}: metric mislabeled as model or shelf-level accuracy (R4)`,
+      );
+      process.exit(1);
+    }
   }
 }
 
