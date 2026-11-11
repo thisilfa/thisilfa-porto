@@ -48,7 +48,11 @@ const channels = [
       ))}
     </div>
     <div class="resume">
-      <a class="cta" href={withBase('/downloads/silfaradila-mei-resume-en.pdf')} download>
+      <a
+        class="btn btn-primary"
+        href={withBase('/downloads/silfaradila-mei-resume-en.pdf')}
+        download
+      >
         {t(lang, 'resume.download')}
       </a>
     </div>
@@ -88,7 +92,7 @@ const channels = [
     width: 100%;
   }
 
-  @media (min-width: 640px) {
+  @media (min-width: 768px) {
     .channels {
       grid-template-columns: 1fr 1fr;
     }
@@ -122,20 +126,5 @@ const channels = [
 
   .resume {
     margin-top: var(--space-3);
-  }
-
-  .cta {
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    color: var(--surface-0);
-    background: var(--neon-magenta);
-    border-radius: var(--radius-pill);
-    padding: var(--space-2) var(--space-5);
-    text-decoration: none;
-    transition: box-shadow var(--transition-fast);
-  }
-
-  .cta:hover {
-    box-shadow: var(--glow-magenta);
   }
 </style>

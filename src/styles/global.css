@@ -48,7 +48,7 @@
   --text-xl: clamp(1.25rem, 0.5vw + 1.1rem, 1.4rem);
   --text-2xl: clamp(1.5rem, 1vw + 1.3rem, 1.9rem);
   --text-3xl: clamp(2rem, 2vw + 1.5rem, 2.6rem);
-  --text-4xl: clamp(2.5rem, 3vw + 1.8rem, 3.4rem);
+  --text-4xl: clamp(2.6rem, 3.4vw + 1.8rem, 4rem);
 
   /* Spacing */
   --space-1: 0.25rem;
@@ -60,6 +60,9 @@
   --space-7: 3rem;
   --space-8: 4rem;
   --space-9: 6rem;
+
+  /* Breakpoint reference: mobile 390 / tablet 768 / desktop 1440.
+   Media queries standardize on max-width 640 (nav) and min-width 768. */
 
   /* Shape and motion */
   --radius-sm: 0.375rem;
@@ -150,6 +153,59 @@ button {
 
 button:hover {
   color: var(--text-high);
+}
+
+/* Component layer — shared button, card, and kicker treatments. */
+.btn {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-pill);
+  padding: var(--space-3) var(--space-6);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    box-shadow var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.btn-primary {
+  color: var(--surface-0);
+  background: var(--neon-magenta);
+}
+
+.btn-primary:hover {
+  box-shadow: var(--glow-magenta);
+}
+
+.btn-quiet {
+  color: var(--text-body);
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+}
+
+.btn-quiet:hover {
+  color: var(--text-high);
+  box-shadow: var(--glow-violet);
+}
+
+.card-surface {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.kicker {
+  color: var(--neon-magenta);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+}
+
+/* Attribute safety: explicit display rules must never defeat [hidden]. */
+[hidden] {
+  display: none !important;
 }
 
 /* Signature effect: faint neon grid, for hero and section moments only. */

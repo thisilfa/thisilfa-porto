@@ -53,13 +53,13 @@ const journey = [
       {t(lang, 'home.available')}
     </p>
     <div class="ctas">
-      <a class="cta" href={withBase('/id/projects/')}>
+      <a class="btn btn-primary" href={withBase('/id/projects/')}>
         {t(lang, 'home.exploreProjects')}
       </a>
-      <a class="cta quiet" href={withBase('/downloads/silfaradila-mei-resume-en.pdf')} download>
+      <a class="btn btn-quiet" href={withBase('/downloads/silfaradila-mei-resume-en.pdf')} download>
         {t(lang, 'home.downloadResume')}
       </a>
-      <a class="cta quiet" href={withBase('/id/contact/')}>
+      <a class="btn btn-quiet" href={withBase('/id/contact/')}>
         {t(lang, 'home.contactCta')}
       </a>
     </div>
@@ -127,7 +127,7 @@ const journey = [
 
   <section class="section closing">
     <h2>Punya masalah menarik untuk diselesaikan atau proyek untuk didiskusikan?</h2>
-    <a class="cta" href={withBase('/id/contact/')}>
+    <a class="btn btn-primary" href={withBase('/id/contact/')}>
       {t(lang, 'home.contactCta')}
     </a>
   </section>
@@ -197,39 +197,21 @@ const journey = [
     margin-top: var(--space-5);
   }
 
-  .cta {
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    color: var(--surface-0);
-    background: var(--neon-magenta);
-    border-radius: var(--radius-pill);
-    padding: var(--space-2) var(--space-5);
-    text-decoration: none;
-    transition:
-      box-shadow var(--transition-fast),
-      transform var(--transition-fast);
-  }
-
-  .cta:hover {
-    box-shadow: var(--glow-magenta);
-    transform: translateY(-1px);
-  }
-
-  .cta.quiet {
-    color: var(--text-body);
-    background: transparent;
-    border: 1px solid var(--border-subtle);
-  }
-
-  .cta.quiet:hover {
-    color: var(--text-high);
-    box-shadow: var(--glow-violet);
-  }
-
   .section {
     max-width: var(--container);
     margin: 0 auto;
     padding: var(--space-8) var(--container-pad) 0;
+  }
+
+  .section h2::before {
+    content: '';
+    display: inline-block;
+    width: 1.75rem;
+    height: 3px;
+    background: var(--neon-magenta);
+    margin-right: var(--space-3);
+    vertical-align: middle;
+    border-radius: var(--radius-sm);
   }
 
   .section h2 {
@@ -247,7 +229,7 @@ const journey = [
     gap: var(--space-5);
   }
 
-  @media (min-width: 760px) {
+  @media (min-width: 768px) {
     .grid {
       grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
     }
@@ -276,7 +258,7 @@ const journey = [
     display: none;
   }
 
-  @media (min-width: 640px) {
+  @media (min-width: 768px) {
     .expertise-list {
       display: none;
     }

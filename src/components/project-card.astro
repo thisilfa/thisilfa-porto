@@ -1,7 +1,8 @@
 ---
-/** Featured project card: title, category + status, overview, stack chips,
- * disclosure + ownership line, and a link to the case study. Data comes from
- * the projects collection (schema fields in src/lib/project-schema.ts). */
+/** Featured project card: labels on top, title, overview, stack chips, and a
+ * disclosure note; case studies add an arrow affordance. Data comes from the
+ * projects collection (schema fields in src/lib/project-schema.ts). */
+import { t, type Lang } from '../i18n/ui';
 import { withBase } from '../lib/urls';
 
 export interface CardEntry {
@@ -21,7 +22,7 @@ export interface CardEntry {
 
 interface Props {
   /** The listing's locale — cards link into that locale's route tree. */
-  locale: 'en' | 'id';
+  locale: Lang;
   entry: CardEntry;
 }
 
@@ -31,14 +32,12 @@ const isCaseStudy = entry.data.kind === 'case-study';
 ---
 
 <article class="card">
-  <header>
-    <h3>{isCaseStudy ? <a href={href}>{entry.data.title}</a> : entry.data.title}</h3>
-    <p class="meta mono">
-      <span class="category">{entry.data.category}</span>
-      {entry.data.period && <span class="period">{entry.data.period}</span>}
-      <span class="status status-{entry.data.statusKind}">{entry.data.statusKind}</span>
-    </p>
-  </header>
+  <p class="meta mono">
+    <span class="category">{entry.data.category}</span>
+    {entry.data.period && <span class="period">{entry.data.period}</span>}
+    <span class="status status-{entry.data.statusKind}">{entry.data.statusKind}</span>
+  </p>
+  <h3>{isCaseStudy ? <a href={href}>{entry.data.title}</a> : entry.data.title}</h3>
   <p class="overview">{entry.data.overview}</p>
   <ul class="stack">
     {entry.data.stack.map((tech) => (
@@ -46,6 +45,11 @@ const isCaseStudy = entry.data.kind === 'case-study';
     ))}
   </ul>
   <p class="disclosure">{entry.data.disclosure}</p>
+  {isCaseStudy && (
+    <p class="read">
+      <a href={href}>{t(locale, 'projects.readCaseStudy')} →</a>
+    </p>
+  )}
 </article>
 
 <style>
@@ -57,6 +61,7 @@ const isCaseStudy = entry.data.kind === 'case-study';
     display: grid;
     gap: var(--space-3);
     align-content: start;
+    grid-template-rows: auto 1fr;
     transition:
       border-color var(--transition-fast),
       box-shadow var(--transition-fast);
@@ -85,7 +90,7 @@ const isCaseStudy = entry.data.kind === 'case-study';
     gap: var(--space-2);
     flex-wrap: wrap;
     font-size: var(--text-xs);
-    margin-top: var(--space-2);
+    align-items: center;
   }
 
   .category {
@@ -147,5 +152,15 @@ const isCaseStudy = entry.data.kind === 'case-study';
     color: var(--text-muted);
     border-top: 1px solid var(--border-subtle);
     padding-top: var(--space-3);
+  }
+
+  .read {
+    margin-top: calc(-1 * var(--space-1));
+  }
+
+  .read a {
+    font-size: var(--text-sm);
+    font-family: var(--font-mono);
+    text-decoration: none;
   }
 </style>
