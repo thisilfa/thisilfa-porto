@@ -69,7 +69,7 @@ website: backend FastAPI yang terhubung ke API AnythingLLM, dengan ChromaDB seba
 retrieval, model OpenAI atau Anthropic Claude yang dapat dipilih pengguna, dan ingest runtime
 halaman web yang sedang dilihat melalui JavaScript. SQL agent: agent berbasis LLM kustom yang
 menerjemahkan pertanyaan bahasa natural tentang data forecast langsung menjadi SQL, dijalankan
-atas akun PostgreSQL read-only bersama. Semua yang solid diimplementasikan oleh saya; tahap
+atas akun PostgreSQL read-only. Semua yang solid diimplementasikan oleh saya; tahap
 hilir yang redup bukan.
 
 ## Implementasi teknis
@@ -92,10 +92,10 @@ Claude pilihan pengguna. Hasil: asisten yang bekerja atas dokumen statis dan hal
 **SQL agent tanpa framework.** Kebutuhan: pertanyaan bahasa natural atas data forecast
 langsung. Pendekatan: agent berbasis LLM kustom yang dibangun langsung dengan Python dan
 panggilan API — tanpa LangChain atau LangGraph — terintegrasi dengan FastAPI dan PostgreSQL,
-menerjemahkan pertanyaan menjadi SQL dan mengeksekusinya. Pengguna aplikasi berbagi akun
-database read-only yang dibatasi pada tabel forecast yang relevan. Hasil: bekerja untuk
-cakupan yang dimaksud; tidak ada otorisasi database per pengguna, dan hal itu dinyatakan
-sebagai batasan, bukan ditutup-tutupi.
+menerjemahkan pertanyaan menjadi SQL dan mengeksekusinya. Akses database bersifat read-only
+dan dibatasi pada tabel forecast yang relevan. Hasil: bekerja untuk cakupan yang dimaksud;
+otorisasi database per pengguna tidak diimplementasikan, dan hal itu dinyatakan sebagai
+batasan, bukan ditutup-tutupi.
 
 **Evaluasi berground.** Kebutuhan: memeriksa bahwa jawaban yang dihasilkan faithful dan
 lengkap. Pendekatan: expected facts dan dokumen referensi pendukung disiapkan; jawaban yang
@@ -145,8 +145,8 @@ menunggu materi yang disetujui pemilik dan sengaja tidak dipalsukan di sini.
   keyword/hybrid (hanya semantik).
 - Tidak ada logging atau pemantauan level aplikasi atas permintaan chat, jawaban, konten yang
   diambil, kesalahan, atau hasil evaluasi.
-- Akun database SQL agent bersifat bersama dan read-only, dibatasi pada tabel forecast yang
-  relevan; tidak ada otorisasi database per pengguna.
+- Akses database SQL agent bersifat read-only dan dibatasi pada tabel forecast yang relevan;
+  otorisasi database per pengguna tidak diimplementasikan.
 - Tahap forecasting/RSL hilir tidak dicakup di sini — dimiliki kontributor lain.
 
 ## Catatan disclosure

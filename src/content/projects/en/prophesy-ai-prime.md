@@ -68,7 +68,7 @@ severity, and signal strength for the downstream stage. Website RAG assistant: a
 backend connected to the AnythingLLM API, with ChromaDB as the retrieval layer, user-selected
 OpenAI or Anthropic Claude models, and runtime ingestion of the currently viewed webpage via
 JavaScript. SQL agent: a custom LLM-powered agent translating natural-language questions
-about live forecast data into SQL, running against a shared read-only PostgreSQL account.
+about live forecast data into SQL, running against a read-only PostgreSQL account.
 Everything solid is implemented by me; the muted downstream stage is not.
 
 ## Technical implementation
@@ -90,9 +90,9 @@ working assistant over both static documents and the live page.
 **SQL agent without a framework.** Requirement: natural-language questions over live forecast
 data. Approach: a custom LLM-powered agent built directly with Python and API calls — no
 LangChain or LangGraph — integrated with FastAPI and PostgreSQL, translating questions into
-SQL and executing them. Application users shared a read-only database account restricted to
-relevant forecast tables. Outcome: worked for the intended scope; there was no per-user
-database authorization, which is stated as a limitation rather than glossed.
+SQL and executing them. Database access was read-only and restricted to the relevant forecast
+tables. Outcome: worked for the intended scope; per-user database authorization was not
+implemented, which is stated as a limitation rather than glossed.
 
 **Grounded evaluation.** Requirement: check that generated answers are faithful and complete.
 Approach: prepared expected facts and supporting reference documents; checked generated
@@ -140,8 +140,8 @@ owner-approved material and are intentionally not faked here.
   (semantic retrieval only).
 - No application-level logging or monitoring of chat requests, answers, retrieved context,
   errors, or evaluation results.
-- The SQL agent's database account was shared and read-only, restricted to relevant forecast
-  tables; there was no per-user database authorization.
+- Database access for the SQL agent was read-only and restricted to the relevant forecast
+  tables; per-user database authorization was not implemented.
 - The downstream forecasting/RSL stage is not covered here — it was owned by another
   contributor.
 
