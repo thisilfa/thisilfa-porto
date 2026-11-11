@@ -1,0 +1,292 @@
+---
+/**
+ * Prophesy AI Prime diagram — generalized, ownership-encoded inline SVG.
+ * Three documented parts: the n8n market-sensing workflow, the website RAG
+ * assistant over ChromaDB, and the custom SQL agent — all implemented
+ * (solid). The downstream forecasting/RSL stage is owned by another
+ * contributor (muted, context). Localized legend and scroll hint.
+ */
+interface Props {
+  title: string;
+  desc: string;
+  legend: { implemented: string; integration: string; context: string };
+  scrollHint: string;
+}
+
+const { title, desc, legend, scrollHint } = Astro.props;
+---
+
+<figure class="diagram-figure">
+  <div class="diagram-scroll">
+    <svg
+      role="img"
+      viewBox="0 0 960 330"
+      width="960"
+      height="330"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-labelledby="prophesy-diagram-title prophesy-diagram-desc"
+      class="diagram"
+    >
+      <title id="prophesy-diagram-title">{title}</title>
+      <desc id="prophesy-diagram-desc">{desc}</desc>
+      <defs>
+        <marker
+          id="pr-arrow"
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" class="arrow-head"></path>
+        </marker>
+      </defs>
+
+      <!-- Part A: market-sensing workflow (implemented) -->
+      <g class="node implemented">
+        <rect x="8" y="30" width="130" height="52" rx="10"></rect>
+        <text x="73" y="52" text-anchor="middle">
+          n8n daily news
+        </text>
+        <text x="73" y="70" text-anchor="middle" class="sub">
+          collection
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="158" y="30" width="130" height="52" rx="10"></rect>
+        <text x="223" y="52" text-anchor="middle">
+          OpenAI structured
+        </text>
+        <text x="223" y="70" text-anchor="middle" class="sub">
+          JSON extraction
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="308" y="30" width="130" height="52" rx="10"></rect>
+        <text x="373" y="52" text-anchor="middle">
+          Relevance filter
+        </text>
+        <text x="373" y="70" text-anchor="middle" class="sub">
+          + deduplication
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="458" y="30" width="120" height="52" rx="10"></rect>
+        <text x="518" y="52" text-anchor="middle">
+          PostgreSQL
+        </text>
+        <text x="518" y="70" text-anchor="middle" class="sub">
+          filtered signals
+        </text>
+      </g>
+
+      <!-- Part B: RAG assistant (implemented) -->
+      <g class="node implemented">
+        <rect x="8" y="140" width="150" height="52" rx="10"></rect>
+        <text x="83" y="162" text-anchor="middle">
+          FastAPI chat backend
+        </text>
+        <text x="83" y="180" text-anchor="middle" class="sub">
+          + webpage capture (JS)
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="188" y="140" width="150" height="52" rx="10"></rect>
+        <text x="263" y="162" text-anchor="middle">
+          Chunk + embed
+        </text>
+        <text x="263" y="180" text-anchor="middle" class="sub">
+          runtime + static
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="368" y="140" width="120" height="52" rx="10"></rect>
+        <text x="428" y="162" text-anchor="middle">
+          ChromaDB
+        </text>
+        <text x="428" y="180" text-anchor="middle" class="sub">
+          semantic retrieval
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="518" y="140" width="170" height="52" rx="10"></rect>
+        <text x="603" y="162" text-anchor="middle">
+          AnythingLLM API
+        </text>
+        <text x="603" y="180" text-anchor="middle" class="sub">
+          OpenAI / Claude selectable
+        </text>
+      </g>
+
+      <!-- Part C: SQL agent (implemented) -->
+      <g class="node implemented">
+        <rect x="8" y="240" width="190" height="52" rx="10"></rect>
+        <text x="103" y="262" text-anchor="middle">
+          Custom SQL agent
+        </text>
+        <text x="103" y="280" text-anchor="middle" class="sub">
+          direct Python + API calls
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="228" y="240" width="160" height="52" rx="10"></rect>
+        <text x="308" y="262" text-anchor="middle">
+          PostgreSQL (read-only)
+        </text>
+        <text x="308" y="280" text-anchor="middle" class="sub">
+          live forecast data
+        </text>
+      </g>
+
+      <!-- Context: downstream stage (other contributor, muted) -->
+      <g class="node context">
+        <rect x="620" y="240" width="230" height="52" rx="10"></rect>
+        <text x="735" y="262" text-anchor="middle">
+          Downstream forecasting / RSL
+        </text>
+        <text x="735" y="280" text-anchor="middle" class="sub">
+          owned by another contributor
+        </text>
+      </g>
+
+      <!-- Flow arrows -->
+      <g class="flow">
+        <line x1="138" y1="56" x2="156" y2="56" marker-end="url(#pr-arrow)"></line>
+        <line x1="288" y1="56" x2="306" y2="56" marker-end="url(#pr-arrow)"></line>
+        <line x1="438" y1="56" x2="456" y2="56" marker-end="url(#pr-arrow)"></line>
+        <line x1="578" y1="56" x2="596" y2="150" marker-end="url(#pr-arrow)"></line>
+        <line x1="158" y1="166" x2="186" y2="166" marker-end="url(#pr-arrow)"></line>
+        <line x1="338" y1="166" x2="366" y2="166" marker-end="url(#pr-arrow)"></line>
+        <line x1="488" y1="166" x2="516" y2="166" marker-end="url(#pr-arrow)"></line>
+        <line x1="198" y1="266" x2="226" y2="266" marker-end="url(#pr-arrow)"></line>
+      </g>
+
+      <!-- Labels for the three parts -->
+      <g class="part-labels">
+        <text x="8" y="20">
+          Market sensing
+        </text>
+        <text x="8" y="130">
+          Website RAG assistant
+        </text>
+        <text x="8" y="230">
+          SQL agent
+        </text>
+        <text x="620" y="230">
+          Downstream (not owned)
+        </text>
+      </g>
+
+      <!-- Localized ownership legend -->
+      <g class="legend">
+        <rect x="8" y="312" width="14" height="14" rx="4" class="swatch implemented"></rect>
+        <text x="28" y="323">
+          {legend.implemented}
+        </text>
+        <rect x="200" y="312" width="14" height="14" rx="4" class="swatch context"></rect>
+        <text x="220" y="323">
+          {legend.context}
+        </text>
+      </g>
+    </svg>
+  </div>
+  <figcaption class="scroll-hint mono">{scrollHint} →</figcaption>
+</figure>
+
+<style>
+  .diagram-figure {
+    margin: var(--space-5) 0 0;
+  }
+
+  .diagram-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    padding: var(--space-3);
+  }
+
+  .diagram {
+    display: block;
+    min-width: 700px;
+    height: auto;
+  }
+
+  .scroll-hint {
+    display: none;
+    margin-top: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 760px) {
+    .scroll-hint {
+      display: block;
+    }
+  }
+
+  .node rect {
+    fill: var(--surface-2);
+  }
+
+  .node.implemented rect {
+    stroke: var(--neon-magenta);
+    stroke-width: 1.5;
+  }
+
+  .node.implemented text {
+    fill: var(--text-high);
+  }
+
+  .node.context rect {
+    stroke: var(--border-subtle);
+    stroke-width: 1;
+  }
+
+  .node.context text {
+    fill: var(--text-muted);
+  }
+
+  .node text {
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  .node .sub {
+    font-size: 11px;
+    opacity: 0.75;
+  }
+
+  .part-labels text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    fill: var(--neon-violet);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .flow line {
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+
+  .arrow-head {
+    fill: var(--neon-magenta);
+  }
+
+  .legend .swatch.implemented {
+    fill: var(--neon-magenta);
+  }
+
+  .legend .swatch.context {
+    fill: var(--surface-2);
+    stroke: var(--border-subtle);
+  }
+
+  .legend text {
+    fill: var(--text-body);
+    font-family: var(--font-body);
+    font-size: 13px;
+  }
+</style>

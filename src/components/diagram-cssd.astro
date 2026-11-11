@@ -1,0 +1,271 @@
+---
+/**
+ * CSSD pipeline diagram — generalized, ownership-encoded inline SVG.
+ * The identification chain (YOLO detect → crop/preprocess → SAM refine →
+ * length estimation → px→cm calibration → metadata filter → DINOv2
+ * embeddings → FAISS/pgvector retrieval) is implemented (solid); the
+ * instrument reference metadata is context whose provenance is not
+ * individually attributed (muted). Localized legend and scroll hint.
+ */
+interface Props {
+  title: string;
+  desc: string;
+  legend: { implemented: string; integration: string; context: string };
+  scrollHint: string;
+}
+
+const { title, desc, legend, scrollHint } = Astro.props;
+---
+
+<figure class="diagram-figure">
+  <div class="diagram-scroll">
+    <svg
+      role="img"
+      viewBox="0 0 960 320"
+      width="960"
+      height="320"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-labelledby="cssd-diagram-title cssd-diagram-desc"
+      class="diagram"
+    >
+      <title id="cssd-diagram-title">{title}</title>
+      <desc id="cssd-diagram-desc">{desc}</desc>
+      <defs>
+        <marker
+          id="cssd-arrow"
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" class="arrow-head"></path>
+        </marker>
+        <marker
+          id="cssd-arrow-muted"
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" class="arrow-head-muted"></path>
+        </marker>
+      </defs>
+
+      <!-- Implemented identification chain (solid) -->
+      <g class="node implemented">
+        <rect x="8" y="40" width="118" height="58" rx="10"></rect>
+        <text x="67" y="64" text-anchor="middle">
+          YOLO detect
+        </text>
+        <text x="67" y="82" text-anchor="middle" class="sub">
+          + initial mask
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="146" y="40" width="120" height="58" rx="10"></rect>
+        <text x="206" y="64" text-anchor="middle">
+          Crop + preprocess
+        </text>
+        <text x="206" y="82" text-anchor="middle" class="sub">
+          background suppression
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="286" y="40" width="100" height="58" rx="10"></rect>
+        <text x="336" y="64" text-anchor="middle">
+          SAM
+        </text>
+        <text x="336" y="82" text-anchor="middle" class="sub">
+          mask refinement
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="406" y="40" width="124" height="58" rx="10"></rect>
+        <text x="468" y="64" text-anchor="middle">
+          Length estimation
+        </text>
+        <text x="468" y="82" text-anchor="middle" class="sub">
+          geometry + PCA
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="550" y="40" width="120" height="58" rx="10"></rect>
+        <text x="610" y="64" text-anchor="middle">
+          px → cm
+        </text>
+        <text x="610" y="82" text-anchor="middle" class="sub">
+          fixed calibration
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="690" y="40" width="124" height="58" rx="10"></rect>
+        <text x="752" y="64" text-anchor="middle">
+          Candidate filter
+        </text>
+        <text x="752" y="82" text-anchor="middle" class="sub">
+          vs metadata
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="834" y="40" width="118" height="58" rx="10"></rect>
+        <text x="893" y="64" text-anchor="middle">
+          DINOv2 + cosine
+        </text>
+        <text x="893" y="82" text-anchor="middle" class="sub">
+          identification
+        </text>
+      </g>
+      <g class="node implemented">
+        <rect x="620" y="150" width="180" height="52" rx="10"></rect>
+        <text x="710" y="172" text-anchor="middle">
+          FAISS (in-memory)
+        </text>
+        <text x="710" y="190" text-anchor="middle" class="sub">
+          + pgvector (persistent)
+        </text>
+      </g>
+
+      <!-- Context: provenance not individually attributed (muted) -->
+      <g class="node context">
+        <rect x="660" y="240" width="200" height="46" rx="10"></rect>
+        <text x="760" y="268" text-anchor="middle">
+          Instrument reference metadata
+        </text>
+      </g>
+
+      <!-- Flow arrows -->
+      <g class="flow">
+        <line x1="126" y1="69" x2="144" y2="69" marker-end="url(#cssd-arrow)"></line>
+        <line x1="266" y1="69" x2="284" y2="69" marker-end="url(#cssd-arrow)"></line>
+        <line x1="386" y1="69" x2="404" y2="69" marker-end="url(#cssd-arrow)"></line>
+        <line x1="530" y1="69" x2="548" y2="69" marker-end="url(#cssd-arrow)"></line>
+        <line x1="670" y1="69" x2="688" y2="69" marker-end="url(#cssd-arrow)"></line>
+        <line x1="814" y1="69" x2="832" y2="69" marker-end="url(#cssd-arrow)"></line>
+        <line x1="893" y1="98" x2="893" y2="140" marker-end="url(#cssd-arrow)"></line>
+        <line x1="820" y1="150" x2="780" y2="140" marker-end="url(#cssd-arrow)"></line>
+        <line
+          x1="760"
+          y1="240"
+          x2="760"
+          y2="204"
+          class="dashed"
+          marker-end="url(#cssd-arrow-muted)"
+        ></line>
+      </g>
+
+      <!-- Localized ownership legend -->
+      <g class="legend">
+        <rect x="8" y="280" width="14" height="14" rx="4" class="swatch implemented"></rect>
+        <text x="28" y="291">
+          {legend.implemented}
+        </text>
+        <rect x="200" y="280" width="14" height="14" rx="4" class="swatch context"></rect>
+        <text x="220" y="291">
+          {legend.context}
+        </text>
+      </g>
+    </svg>
+  </div>
+  <figcaption class="scroll-hint mono">{scrollHint} →</figcaption>
+</figure>
+
+<style>
+  .diagram-figure {
+    margin: var(--space-5) 0 0;
+  }
+
+  .diagram-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    padding: var(--space-3);
+  }
+
+  .diagram {
+    display: block;
+    min-width: 700px;
+    height: auto;
+  }
+
+  .scroll-hint {
+    display: none;
+    margin-top: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 760px) {
+    .scroll-hint {
+      display: block;
+    }
+  }
+
+  .node rect {
+    fill: var(--surface-2);
+  }
+
+  .node.implemented rect {
+    stroke: var(--neon-magenta);
+    stroke-width: 1.5;
+  }
+
+  .node.implemented text {
+    fill: var(--text-high);
+  }
+
+  .node.context rect {
+    stroke: var(--border-subtle);
+    stroke-width: 1;
+  }
+
+  .node.context text {
+    fill: var(--text-muted);
+  }
+
+  .node text {
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  .node .sub {
+    font-size: 11px;
+    opacity: 0.75;
+  }
+
+  .flow line {
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+
+  .flow line.dashed {
+    stroke-dasharray: 5 4;
+  }
+
+  .arrow-head {
+    fill: var(--neon-magenta);
+  }
+
+  .arrow-head-muted {
+    fill: var(--text-muted);
+  }
+
+  .legend .swatch.implemented {
+    fill: var(--neon-magenta);
+  }
+
+  .legend .swatch.context {
+    fill: var(--surface-2);
+    stroke: var(--border-subtle);
+  }
+
+  .legend text {
+    fill: var(--text-body);
+    font-family: var(--font-body);
+    font-size: 13px;
+  }
+</style>
