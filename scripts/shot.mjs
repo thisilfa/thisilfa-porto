@@ -52,7 +52,7 @@ const page = await browser.newPage({ viewport: { width, height } });
 await page.goto(`http://localhost:4173/thisilfa-porto${route === '/' ? '/' : route}`, {
   waitUntil: 'networkidle',
 });
-await page.screenshot({ path: out, fullPage: true });
+await page.screenshot({ path: out, fullPage: process.argv[6] === 'full' });
 await browser.close();
 if (started) spawnSync('npx', ['astro', 'preview', 'stop'], { stdio: 'ignore' });
 console.log(`shot — ${route} @${width} → ${out}`);

@@ -47,70 +47,87 @@ const onPage = headings.filter((h) => h.depth === 2);
       <p class="overview">{d.overview}</p>
     </header>
 
-    {d.contribution && d.contribution.length > 0 && (
-      <section class="contribution" aria-labelledby="contribution-heading">
-        <h2 id="contribution-heading">{t(lang, 'projects.contribution')}</h2>
-        {d.contribution.map((group) =>
-          group.group === 'unattributed' ? (
-            <p class="unattributed">
-              <span class="mono group-label">{t(lang, 'contribution.unattributed')}</span>
-              {' — '}
-              {group.items.join(' · ')}
-            </p>
-          ) : (
-            <div class="group">
-              <p class="mono group-label">{t(lang, `contribution.${group.group}` as const)}</p>
-              <ul>
-                {group.items.map((item) => (
-                  <li>{item}</li>
-                ))}
-              </ul>
-            </div>
-          ),
-        )}
-      </section>
-    )}
+    <div class="body-grid">
+      {d.contribution && d.contribution.length > 0 && (
+        <section class="contribution" aria-labelledby="contribution-heading">
+          <h2 id="contribution-heading">{t(lang, 'projects.contribution')}</h2>
+          {d.contribution.map((group) =>
+            group.group === 'unattributed' ? (
+              <p class="unattributed">
+                <span class="mono group-label">{t(lang, 'contribution.unattributed')}</span>
+                {' — '}
+                {group.items.join(' · ')}
+              </p>
+            ) : (
+              <div class="group">
+                <p class="mono group-label">{t(lang, `contribution.${group.group}` as const)}</p>
+                <ul>
+                  {group.items.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ),
+          )}
+        </section>
+      )}
 
-    {Diagram && (
-      <figure class="diagram">
-        <Diagram
-          lang={lang}
-          title={d.diagram ? t(lang, `diagram.${d.diagram}.title` as never) : ''}
-          desc={d.diagram ? t(lang, `diagram.${d.diagram}.desc` as never) : ''}
-          legend={{
-            implemented: t(lang, 'diagram.legend.implemented'),
-            integration: t(lang, 'diagram.legend.integration'),
-            context: t(lang, 'diagram.legend.context'),
-          }}
-          scrollHint={t(lang, 'diagram.scrollHint')}
-        />
-      </figure>
-    )}
+      {Diagram && (
+        <figure class="diagram">
+          <Diagram
+            lang={lang}
+            title={d.diagram ? t(lang, `diagram.${d.diagram}.title` as never) : ''}
+            desc={d.diagram ? t(lang, `diagram.${d.diagram}.desc` as never) : ''}
+            legend={{
+              implemented: t(lang, 'diagram.legend.implemented'),
+              integration: t(lang, 'diagram.legend.integration'),
+              context: t(lang, 'diagram.legend.context'),
+            }}
+            scrollHint={t(lang, 'diagram.scrollHint')}
+          />
+        </figure>
+      )}
 
-    {onPage.length > 0 && (
-      <nav class="on-page" aria-label={t(lang, 'projects.onPage')}>
-        <span class="mono on-page-label">{t(lang, 'projects.onPage')}</span>
-        <ul>
-          {onPage.map((heading) => (
-            <li>
-              <a class="mono" href={`#${heading.slug}`}>
-                {heading.text}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    )}
+      {onPage.length > 0 && (
+        <nav class="on-page" aria-label={t(lang, 'projects.onPage')}>
+          <span class="mono on-page-label">{t(lang, 'projects.onPage')}</span>
+          <ul>
+            {onPage.map((heading) => (
+              <li>
+                <a class="mono" href={`#${heading.slug}`}>
+                  {heading.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
 
-    <div class="prose">
-      <Content />
+      <div class="prose">
+        <Content />
+      </div>
+
+      <footer class="note">
+        <p class="mono note-label">{t(lang, 'projects.redacted')}</p>
+        <p>{d.disclosure}</p>
+        <a href={withBase('/projects/')}>{t(lang, 'projects.backTo')}</a>
+      </footer>
+
+      {onPage.length > 0 && (
+        <aside class="toc" aria-label={t(lang, 'projects.onPage')}>
+          <p class="mono toc-label">{t(lang, 'projects.onPage')}</p>
+          <ul>
+            {onPage.map((heading) => (
+              <li>
+                <a class="mono" href={`#${heading.slug}`}>
+                  {heading.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
     </div>
-
-    <footer class="note">
-      <p class="mono note-label">{t(lang, 'projects.redacted')}</p>
-      <p>{d.disclosure}</p>
-      <a href={withBase('/projects/')}>{t(lang, 'projects.backTo')}</a>
-    </footer>
   </article>
 </Base>
 
@@ -227,6 +244,71 @@ const onPage = headings.filter((h) => h.depth === 2);
   .unattributed .group-label {
     color: var(--text-muted);
     margin-bottom: 0;
+  }
+
+  /* Desktop: prose column + sticky on-page navigation in the right rail. */
+  .body-grid {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  /* Grid children must shrink below their content width, or the diagram's
+     700px min-width forces the whole track past the mobile viewport. */
+  .body-grid > * {
+    min-width: 0;
+  }
+
+  .toc {
+    display: none;
+  }
+
+  @media (min-width: 1200px) {
+    .body-grid {
+      grid-template-columns: minmax(0, 1fr) 14rem;
+      align-items: start;
+    }
+
+    .on-page {
+      display: none;
+    }
+
+    .toc {
+      display: block;
+      grid-column: 2;
+      grid-row: 1 / -1;
+      position: sticky;
+      top: 6rem;
+      max-height: calc(100vh - 8rem);
+      overflow-y: auto;
+      border-left: 1px solid var(--border-subtle);
+      padding-left: var(--space-4);
+    }
+
+    .toc-label {
+      color: var(--neon-violet);
+      font-size: var(--text-xs);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-3);
+    }
+
+    .toc ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .toc a {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      color: var(--neon-magenta);
+    }
   }
 
   /* Markdown body styles */
