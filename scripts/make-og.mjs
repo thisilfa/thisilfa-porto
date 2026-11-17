@@ -3,7 +3,7 @@
 //   node scripts/make-og.mjs
 import sharp from 'sharp';
 
-const source = 'content/Neon Cat Lover’s Cyberpunk Lounge.png';
+const source = 'src/assets/editorial-full-portrait.png';
 
 await sharp(source)
   .resize(1200, 630, { fit: 'cover', position: 'attention' })
