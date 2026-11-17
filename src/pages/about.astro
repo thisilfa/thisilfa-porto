@@ -5,7 +5,7 @@ import { Image } from 'astro:assets';
 import Base from '../layouts/base.astro';
 import { t } from '../i18n/ui';
 import { withBase } from '../lib/urls';
-import portrait from '../assets/profile/neon-cat-lounge.png';
+import portrait from '../../content/image-me.png';
 
 const lang = 'en' as const;
 
@@ -57,7 +57,7 @@ const experience = [
     <div class="portrait">
       <Image
         src={portrait}
-        alt="Illustrated portrait of Silfaradila at a neon-lit desk with her cat, in the site's magenta-and-violet cyberpunk palette"
+        alt="Portrait of Silfaradila Mei in her workspace"
         width={600}
         loading="eager"
       />
