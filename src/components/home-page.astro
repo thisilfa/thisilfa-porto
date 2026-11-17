@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import headshot from '../assets/editorial-headshot.png';
+import cbirVisual from '../assets/projects/cbir.png';
 import cssdVisual from '../assets/projects/cssd.png';
 import faceAttendanceVisual from '../assets/projects/face-attendance.png';
 import materialsCountingVisual from '../assets/projects/materials-counting.png';
@@ -31,6 +32,7 @@ const galleryAssets = {
   workguard: workguardVisual,
   'face-attendance': faceAttendanceVisual,
   'yolov5-counting': materialsCountingVisual,
+  'cbir-tokoquick': cbirVisual,
 };
 
 const galleryOrder = [
@@ -39,6 +41,7 @@ const galleryOrder = [
   'workguard',
   'face-attendance',
   'yolov5-counting',
+  'cbir-tokoquick',
 ];
 const galleryProjects = galleryOrder
   .map((slug) => projects.find((entry) => entrySlug(entry.id) === slug))
@@ -52,6 +55,7 @@ const galleryAlt = (slug: string) => {
         workguard: 'Visual deteksi aktivitas dan pelanggaran keselamatan kerja dari CCTV',
         'face-attendance': 'Visual sistem presensi wajah dan alur integrasinya',
         'yolov5-counting': 'Visual penghitungan material dengan deteksi objek YOLO',
+        'cbir-tokoquick': 'Antarmuka pencarian suku cadang berbasis citra untuk TokoQuick',
       }
     : {
         sims: 'Four-zone shelf SKU counting visual for the SIMS project',
@@ -60,6 +64,7 @@ const galleryAlt = (slug: string) => {
         workguard: 'CCTV workplace activity and safety violation detection visual',
         'face-attendance': 'Face attendance system and integration workflow visual',
         'yolov5-counting': 'YOLO object-detection visual for materials counting',
+        'cbir-tokoquick': 'Image-based spare-part search interface for TokoQuick',
       };
 
   return labels[slug as keyof typeof labels];
