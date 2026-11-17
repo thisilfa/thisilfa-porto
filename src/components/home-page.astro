@@ -1,0 +1,1608 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import headshot from '../assets/editorial-headshot.png';
+import cssdVisual from '../assets/projects/cssd.png';
+import faceAttendanceVisual from '../assets/projects/face-attendance.png';
+import materialsCountingVisual from '../assets/projects/materials-counting.png';
+import simsVisual from '../assets/projects/sims.png';
+import workguardVisual from '../assets/projects/workguard.png';
+import type { Lang } from '../i18n/ui';
+import { entrySlug } from '../lib/content';
+import { withBase } from '../lib/urls';
+
+interface Props {
+  lang: Lang;
+  featured: CollectionEntry<'projects'>[];
+  projects: CollectionEntry<'projects'>[];
+  projectCount: number;
+}
+
+const { lang, featured, projects, projectCount } = Astro.props;
+const isId = lang === 'id';
+const projectsHref = withBase(isId ? '/id/projects/' : '/projects/');
+const aboutHref = withBase(isId ? '/id/about/' : '/about/');
+const projectHref = (entry: CollectionEntry<'projects'>) =>
+  withBase(isId ? `/id/projects/${entrySlug(entry.id)}/` : `/projects/${entrySlug(entry.id)}/`);
+
+const galleryAssets = {
+  sims: simsVisual,
+  'cssd-instrument-id': cssdVisual,
+  workguard: workguardVisual,
+  'face-attendance': faceAttendanceVisual,
+  'yolov5-counting': materialsCountingVisual,
+};
+
+const galleryOrder = [
+  'sims',
+  'cssd-instrument-id',
+  'workguard',
+  'face-attendance',
+  'yolov5-counting',
+];
+const galleryProjects = galleryOrder
+  .map((slug) => projects.find((entry) => entrySlug(entry.id) === slug))
+  .filter((entry): entry is CollectionEntry<'projects'> => Boolean(entry));
+
+const galleryAlt = (slug: string) => {
+  const labels = isId
+    ? {
+        sims: 'Visual penghitungan empat zona SKU pada rak untuk proyek SIMS',
+        'cssd-instrument-id': 'Visual identifikasi dan pemeriksaan abnormalitas instrumen bedah',
+        workguard: 'Visual deteksi aktivitas dan pelanggaran keselamatan kerja dari CCTV',
+        'face-attendance': 'Visual sistem presensi wajah dan alur integrasinya',
+        'yolov5-counting': 'Visual penghitungan material dengan deteksi objek YOLO',
+      }
+    : {
+        sims: 'Four-zone shelf SKU counting visual for the SIMS project',
+        'cssd-instrument-id':
+          'Surgical instrument identification and abnormality inspection visual',
+        workguard: 'CCTV workplace activity and safety violation detection visual',
+        'face-attendance': 'Face attendance system and integration workflow visual',
+        'yolov5-counting': 'YOLO object-detection visual for materials counting',
+      };
+
+  return labels[slug as keyof typeof labels];
+};
+
+const stages = isId
+  ? [
+      ['Masalah', 'Batasan, data, dan bukti operasional'],
+      ['Kecerdasan', 'Model, retrieval, dan evaluasi'],
+      ['Integrasi', 'API, data, dan antarmuka sistem'],
+      ['Operasi', 'Deployment, monitoring, dan iterasi'],
+    ]
+  : [
+      ['Problem', 'Constraints, data, and operational evidence'],
+      ['Intelligence', 'Models, retrieval, and evaluation'],
+      ['Integration', 'APIs, data, and system interfaces'],
+      ['Operation', 'Deployment, monitoring, and iteration'],
+    ];
+
+const philosophy = isId
+  ? [
+      ['Masalah sebelum teknologi', 'Pahami masalah sebelum memilih model atau framework.'],
+      ['Eksperimentasi, bukan asumsi', 'Validasi keputusan teknis melalui eksperimen.'],
+      ['Pemikiran end-to-end', 'Pertimbangkan sistem secara utuh, bukan hanya modelnya.'],
+      ['Rekayasa praktis', 'Utamakan keandalan, kemudahan pemeliharaan, dan hasil yang terukur.'],
+    ]
+  : [
+      [
+        'Problem before technology',
+        'Understand the problem before selecting a model or framework.',
+      ],
+      ['Experimentation over assumptions', 'Validate technical decisions through experiments.'],
+      ['End-to-end thinking', 'Consider the complete system, not only the model.'],
+      [
+        'Practical engineering',
+        'Prioritize reliability, maintainability, and measurable outcomes.',
+      ],
+    ];
+---
+
+<section class="editorial-hero" data-enter>
+  <canvas class="petals petal-canvas" data-petals="hero" aria-hidden="true"></canvas>
+  <div class="wrap hero-layout">
+    <div class="hero-text">
+      <p class="hero-kicker mono">AI Engineer · Computer Vision · Applied AI</p>
+      <h1>
+        {isId ? 'Rekayasa AI untuk sistem operasional.' : 'AI engineering for real-world systems.'}
+      </h1>
+      <p class="hero-lede">
+        {isId
+          ? 'Saya menghubungkan eksperimen machine learning dengan sistem yang dapat dipakai, dari pipeline computer vision hingga API dan deployment.'
+          : 'I connect machine-learning experiments to systems people can use, from computer vision pipelines to APIs and deployment.'}
+      </p>
+      <div class="hero-facts" aria-label={isId ? 'Ringkasan portofolio' : 'Portfolio summary'}>
+        <p>
+          <strong>{projectCount}</strong>
+          <span>{isId ? 'proyek terdokumentasi' : 'documented projects'}</span>
+        </p>
+        <p>
+          <strong>{featured.length}</strong>
+          <span>{isId ? 'studi kasus lengkap' : 'complete case studies'}</span>
+        </p>
+      </div>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#selected-work">
+          {isId ? 'Lihat proyek pilihan' : 'View selected work'}
+        </a>
+        <a class="btn btn-secondary" href={aboutHref}>
+          {isId ? 'Tentang saya' : 'About me'}
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-portrait">
+      <Image
+        src={headshot}
+        alt={isId ? 'Potret Silfaradila Mei' : 'Portrait of Silfaradila Mei'}
+        widths={[480, 720, 1000]}
+        sizes="(max-width: 639px) 72vw, (max-width: 1023px) 42vw, 44vw"
+        loading="eager"
+      />
+      <span class="portrait-orbit" aria-hidden="true"></span>
+    </div>
+  </div>
+</section>
+
+<section class="system-bridge" data-scroll-bridge aria-labelledby="bridge-title">
+  <div class="wrap bridge-inner">
+    <div class="bridge-phase bridge-tagline">
+      <h2 id="bridge-title">
+        <span class="tagline-line tagline-line--beyond">
+          {isId ? 'Melampaui Model.' : 'Beyond Models.'}
+        </span>
+        <span class="tagline-line tagline-line--systems">
+          {isId ? 'Menuju Sistem.' : 'Into Systems.'}
+        </span>
+      </h2>
+    </div>
+
+    <div class="bridge-phase engineering-philosophy" aria-labelledby="philosophy-title">
+      <div class="philosophy-layout">
+        <h2 id="philosophy-title">{isId ? 'Filosofi rekayasa.' : 'Engineering philosophy.'}</h2>
+        <ol class="philosophy-list">
+          {philosophy.map(([title, detail]) => (
+            <li data-philosophy-step>
+              <h3>{title}</h3>
+              <p>{detail}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+{galleryProjects.length > 0 && (
+  <section
+    class="selected-work"
+    id="selected-work"
+    data-scroll-gallery
+    aria-labelledby="gallery-title"
+  >
+    <div class="gallery-sticky wrap">
+      <div class="gallery-inner">
+        <div class="gallery-heading">
+          <div>
+            <p class="section-label mono">{isId ? 'Proyek pilihan' : 'Selected work'}</p>
+            <h2 id="gallery-title">{isId ? 'Galeri sistem AI.' : 'AI systems gallery.'}</h2>
+          </div>
+          <a class="all-work" href={projectsHref}>
+            {isId ? 'Lihat semua proyek' : 'View all projects'} <span aria-hidden="true">→</span>
+          </a>
+        </div>
+
+        <div class="gallery-rows">
+          {[galleryProjects.slice(0, 3), galleryProjects.slice(3)].map((row, rowIndex) => (
+            <div
+              class:list={[
+                'gallery-row',
+                rowIndex === 0 ? 'gallery-row--first' : 'gallery-row--second',
+              ]}
+              data-gallery-row={rowIndex === 0 ? 'first' : 'second'}
+            >
+              {row.map((entry) => {
+                const slug = entrySlug(entry.id);
+                const CardTag = entry.data.kind === 'case-study' ? 'a' : 'div';
+                return (
+                  <article class="work-card">
+                    <CardTag
+                      class="work-card__inner"
+                      href={entry.data.kind === 'case-study' ? projectHref(entry) : undefined}
+                      aria-label={
+                        entry.data.kind === 'case-study'
+                          ? `${isId ? 'Buka' : 'Open'} ${entry.data.title}`
+                          : undefined
+                      }
+                    >
+                      <div class="work-card__visual">
+                        <Image
+                          src={galleryAssets[slug as keyof typeof galleryAssets]}
+                        alt={galleryAlt(slug)}
+                        widths={[520, 760, 1000]}
+                        sizes="(max-width: 767px) 72vw, 27rem"
+                        loading="lazy"
+                      />
+                      </div>
+                      <div class="work-card__body">
+                        <h3>{entry.data.title}</h3>
+                        <ul
+                          aria-label={isId ? 'Keahlian dan teknologi' : 'Skills and technologies'}
+                        >
+                          {entry.data.stack.slice(0, 5).map((skill) => (
+                            <li>{skill}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </CardTag>
+                  </article>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
+<section class="method-section" aria-labelledby="method-title">
+  <div class="wrap method-layout">
+    <div class="method-heading">
+      <p class="section-label mono">{isId ? 'Cara kerja' : 'Engineering method'}</p>
+      <h2 id="method-title">
+        {isId ? 'Dari masalah hingga operasi.' : 'From problem to operation.'}
+      </h2>
+    </div>
+    <div class="timeline" data-method-timeline>
+      <span class="timeline-progress" aria-hidden="true"></span>
+      <ol class="method-steps">
+        {stages.map(([title, detail]) => (
+          <li data-timeline-step>
+            <span class="method-node" aria-hidden="true"></span>
+            <h3>{title}</h3>
+            <p>{detail}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .editorial-home {
+    --home-section-pad: clamp(4.5rem, 8vh, 7rem);
+  }
+
+  .editorial-hero,
+  .selected-work,
+  .method-section,
+  .profile-section {
+    color: var(--ink);
+  }
+
+  .editorial-hero {
+    height: calc(100svh - var(--nav-height));
+    min-height: 44rem;
+    position: relative;
+    overflow: hidden;
+    background: var(--canvas);
+  }
+
+  .hero-layout {
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--grid-gap);
+    align-items: center;
+    padding-block: var(--space-7);
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-text {
+    grid-column: 1 / span 6;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-kicker,
+  .section-label {
+    color: var(--blue);
+    font-size: var(--text-xs);
+    font-weight: 500;
+  }
+  .hero-text h1 {
+    max-width: 12ch;
+    margin-top: var(--space-5);
+    font-family: var(--font-editorial);
+    font-size: clamp(4rem, 6.3vw, 5.75rem);
+    font-weight: 400;
+    line-height: 0.96;
+    letter-spacing: -0.035em;
+  }
+  .hero-lede {
+    max-width: 38rem;
+    margin-top: var(--space-6);
+    font-size: var(--text-lg);
+    line-height: 1.55;
+  }
+  .hero-facts {
+    max-width: 31rem;
+    display: flex;
+    gap: var(--space-6);
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--rule);
+  }
+  .hero-facts p {
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+  .hero-facts p + p {
+    padding-left: var(--space-6);
+    border-left: 1px solid var(--rule);
+  }
+  .hero-facts strong {
+    color: var(--rust);
+    font-family: var(--font-editorial);
+    font-size: 2.35rem;
+    font-weight: 400;
+    line-height: 0.8;
+  }
+  .hero-facts span {
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+  .hero-actions {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-7);
+  }
+
+  .hero-portrait {
+    grid-column: 7 / -1;
+    justify-self: end;
+    width: min(100%, 38rem);
+    aspect-ratio: 1;
+    position: relative;
+    border-radius: 50%;
+  }
+  .hero-portrait :global(img) {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+    transition: transform 600ms ease;
+  }
+  .hero-portrait:hover :global(img) {
+    transform: scale(1.025);
+  }
+  .portrait-orbit {
+    position: absolute;
+    inset: -1.5rem;
+    z-index: -1;
+    border: 1px solid color-mix(in srgb, var(--blue) 45%, transparent);
+    border-radius: 50%;
+    transform: translate(-1.5rem, 1rem);
+  }
+
+  .petals {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  [data-enter] .hero-text > * {
+    animation: enter-copy 650ms both;
+  }
+  [data-enter] .hero-text > :nth-child(2) {
+    animation-delay: 70ms;
+  }
+  [data-enter] .hero-text > :nth-child(3) {
+    animation-delay: 140ms;
+  }
+  [data-enter] .hero-text > :nth-child(4) {
+    animation-delay: 210ms;
+  }
+  [data-enter] .hero-text > :nth-child(5) {
+    animation-delay: 280ms;
+  }
+  [data-enter] .hero-portrait {
+    animation: enter-portrait 760ms 120ms both;
+  }
+  @keyframes enter-copy {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes enter-portrait {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .selected-work {
+    min-height: 100svh;
+    padding-block: clamp(3.5rem, 6vh, 4rem);
+    background: var(--surface);
+  }
+  .section-head {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--grid-gap);
+    align-items: start;
+  }
+  .section-head h2,
+  .profile-copy h2 {
+    max-width: 15ch;
+    margin-top: var(--space-4);
+    font-family: var(--font-editorial);
+    font-size: clamp(3rem, 4.4vw, 4.5rem);
+    font-weight: 400;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+  }
+  .section-head > p {
+    width: 100%;
+    font-size: var(--text-lg);
+  }
+
+  .project-gallery {
+    margin-top: calc(var(--space-8) - 0.5rem);
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--space-8) var(--grid-gap);
+  }
+  .gallery-project {
+    grid-column: span 6;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(16rem, 1.1fr);
+    gap: var(--space-5);
+    align-items: start;
+    min-width: 0;
+  }
+  .gallery-project--lead {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(17rem, 5fr) minmax(0, 7fr);
+    gap: var(--grid-gap);
+    padding-bottom: var(--space-6);
+  }
+  .gallery-project__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .gallery-project h3 {
+    max-width: 17ch;
+    margin-top: var(--space-4);
+    font-family: var(--font-editorial);
+    font-size: var(--text-2xl);
+    font-weight: 400;
+    line-height: 1.05;
+  }
+  .gallery-project h3 {
+    font-size: var(--text-xl);
+  }
+  .gallery-project__visual {
+    min-height: 44px;
+    display: block;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: #ebe8e1;
+    text-decoration: none;
+    transition:
+      transform var(--transition-fast),
+      border-color var(--transition-fast);
+  }
+  .gallery-project__visual :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    display: block;
+    object-fit: cover;
+    transition: transform 600ms ease;
+  }
+  .gallery-project__visual:hover {
+    transform: translateY(-2px);
+    border-color: var(--blue);
+  }
+  .gallery-project__visual:hover :global(img) {
+    transform: scale(1.025);
+  }
+  .gallery-project__visual:focus-visible,
+  .project-link:focus-visible,
+  .all-work:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 4px;
+  }
+  .project-meta-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .project-meta {
+    color: var(--blue);
+    font-size: 0.8125rem;
+  }
+  .project-status {
+    min-height: 1.6rem;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding-inline: 0.55rem;
+    border: 1px solid currentColor;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1;
+  }
+  .project-status::before {
+    width: 0.38rem;
+    height: 0.38rem;
+    border-radius: 50%;
+    background: currentColor;
+    content: '';
+  }
+  .project-status--delivered {
+    color: var(--rust);
+  }
+  .project-status--staging {
+    color: var(--green);
+  }
+  .project-status--research {
+    color: var(--amber);
+  }
+  .project-status--unverified {
+    color: var(--ink);
+  }
+  .project-contribution {
+    max-width: 52ch;
+    margin-top: var(--space-4);
+    color: var(--ink);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .project-contribution b {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .project-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    color: var(--ink);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 0.25em;
+  }
+  .project-evidence {
+    max-width: 28rem;
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--ink);
+  }
+  .project-evidence strong {
+    display: block;
+    color: var(--green);
+    font-family: var(--font-editorial);
+    font-size: clamp(2.25rem, 3vw, 2.75rem);
+    font-weight: 400;
+    line-height: 1;
+  }
+  .project-evidence span {
+    display: block;
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    line-height: 1.4;
+  }
+  .project-evidence small {
+    display: block;
+    margin-top: var(--space-2);
+    color: var(--ink-soft);
+    font-size: 0.66rem;
+    line-height: 1.4;
+  }
+  .all-work {
+    width: 100%;
+    margin-top: var(--space-7);
+    padding-top: var(--space-4);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--ink);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .method-section {
+    --accent: var(--rust);
+    min-height: 100svh;
+    display: grid;
+    align-items: center;
+    background: var(--canvas);
+  }
+  .method-layout {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--grid-gap);
+    align-items: center;
+    padding-block: var(--section-pad);
+  }
+  .method-statement h2 {
+    max-width: 14ch;
+    margin-top: var(--space-5);
+    color: color-mix(in srgb, var(--ink) 48%, var(--canvas));
+    font-family: var(--font-editorial);
+    font-size: clamp(3.5rem, 6vw, 6.5rem);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+  }
+  .method-statement h2 strong {
+    color: var(--rust);
+    font-weight: inherit;
+  }
+  .method-steps {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--ink);
+  }
+  .method-steps::before {
+    width: 1px;
+    position: absolute;
+    top: 3.5rem;
+    bottom: 3.5rem;
+    left: 0.35rem;
+    background: color-mix(in srgb, var(--rust) 45%, var(--rule));
+    content: '';
+  }
+  .method-steps li {
+    min-height: 7rem;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.5rem 0.8fr 1.2fr;
+    gap: var(--space-4);
+    align-items: center;
+    border-bottom: 1px solid var(--rule);
+  }
+  .method-steps .method-node {
+    z-index: 1;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--rust);
+  }
+  .method-steps h3 {
+    font-family: var(--font-editorial);
+    font-size: var(--text-xl);
+    font-weight: 400;
+  }
+  .method-steps p {
+    color: var(--ink-soft);
+    font-size: var(--text-sm);
+  }
+
+  .profile-section {
+    min-height: 100svh;
+    display: grid;
+    align-items: center;
+    padding-block: var(--section-pad);
+    background: var(--surface-strong);
+  }
+  .profile-layout {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--grid-gap);
+    align-items: start;
+  }
+  .profile-photo {
+    grid-column: 1 / span 5;
+    height: min(72svh, 44rem);
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+  .profile-photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 28%;
+    transition: transform 600ms ease;
+  }
+  .profile-photo:hover :global(img) {
+    transform: scale(1.025);
+  }
+  .profile-copy {
+    grid-column: 7 / -1;
+  }
+  .profile-copy > p:not(.section-label) {
+    max-width: 40rem;
+    margin-top: var(--space-6);
+    font-size: var(--text-lg);
+  }
+  .career-list {
+    margin-top: var(--space-7);
+    border-top: 1px solid var(--ink);
+  }
+  .career-list > div {
+    min-height: 5rem;
+    display: grid;
+    grid-template-columns: 0.8fr 1fr 1.2fr;
+    gap: var(--space-4);
+    align-items: center;
+    border-bottom: 1px solid var(--rule);
+  }
+  .career-list span {
+    color: var(--ink-soft);
+    font-size: var(--text-xs);
+  }
+  .career-list strong {
+    font-weight: 500;
+  }
+  .career-list p {
+    color: var(--ink-soft);
+  }
+  .profile-actions {
+    display: flex;
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+  }
+
+  :global(body.editorial-home .site-footer) {
+    background: var(--ink);
+  }
+  :global(body.editorial-home .site-footer .inner) {
+    padding-block: calc(var(--space-8) - 0.5rem);
+  }
+  :global(body.editorial-home .site-footer h2),
+  :global(body.editorial-home .site-footer .footer-mark) {
+    font-family: var(--font-editorial);
+    font-weight: 400;
+  }
+
+  @media (max-width: 1023px) {
+    .hero-layout {
+      align-items: center;
+    }
+    .hero-text h1 {
+      font-size: clamp(3.6rem, 7vw, 4.8rem);
+    }
+    .hero-portrait {
+      width: min(100%, 30rem);
+    }
+    .section-head,
+    .method-layout {
+      grid-template-columns: 1fr;
+    }
+    .section-head > p {
+      margin-top: var(--space-5);
+    }
+    .selected-work,
+    .method-section,
+    .profile-section {
+      min-height: auto;
+    }
+    .gallery-project {
+      grid-column: 1 / -1;
+      grid-template-columns: minmax(15rem, 5fr) minmax(0, 7fr);
+    }
+    .gallery-project--lead {
+      grid-template-columns: minmax(15rem, 5fr) minmax(0, 7fr);
+    }
+    .method-steps {
+      margin-top: var(--space-7);
+    }
+    .method-statement h2 {
+      max-width: 17ch;
+    }
+    .profile-photo {
+      grid-column: 1 / span 6;
+      height: 38rem;
+    }
+    .profile-copy {
+      grid-column: 7 / -1;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .selected-work {
+      min-height: 200svh;
+    }
+    .gallery-project--lead {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+    .gallery-project--lead .gallery-project__copy {
+      grid-column: 1 / span 5;
+    }
+    .gallery-project--lead .gallery-project__visual {
+      grid-column: 6 / -1;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .editorial-hero {
+      height: auto;
+      min-height: calc(100svh - var(--nav-height));
+    }
+    .hero-layout {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      padding-block: var(--space-6);
+    }
+    .hero-text {
+      order: 1;
+    }
+    .hero-text h1 {
+      max-width: 11ch;
+      margin-top: var(--space-4);
+      font-size: clamp(3rem, 12vw, 4rem);
+    }
+    .hero-lede {
+      margin-top: var(--space-5);
+      font-size: 1rem;
+    }
+    .hero-fact {
+      margin-top: var(--space-4);
+    }
+    .hero-actions {
+      margin-top: var(--space-5);
+    }
+    .hero-portrait {
+      order: 2;
+      width: min(72vw, 18rem);
+      margin: var(--space-6) auto 0;
+    }
+    .portrait-orbit {
+      inset: -0.75rem;
+      transform: translate(-0.6rem, 0.4rem);
+    }
+    .selected-work {
+      padding-block: var(--space-8);
+    }
+    .profile-section {
+      padding-block: var(--space-9);
+    }
+    .section-head {
+      display: block;
+    }
+    .section-head h2,
+    .profile-copy h2 {
+      font-size: 3rem;
+    }
+    .project-gallery {
+      grid-template-columns: 1fr;
+    }
+    .gallery-project,
+    .gallery-project--lead {
+      grid-column: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .gallery-project--lead {
+      padding-bottom: var(--space-7);
+    }
+    .method-section {
+      min-height: auto;
+    }
+    .method-layout {
+      padding-block: var(--space-9);
+    }
+    .method-statement h2 {
+      font-size: 3.4rem;
+    }
+    .method-steps li {
+      grid-template-columns: 1.5rem 1fr;
+      padding-block: var(--space-4);
+    }
+    .method-steps p {
+      grid-column: 2;
+    }
+    .profile-layout {
+      display: flex;
+      flex-direction: column;
+    }
+    .profile-photo {
+      width: 100%;
+      height: 30rem;
+    }
+    .profile-copy {
+      margin-top: var(--space-7);
+    }
+    .career-list > div {
+      grid-template-columns: 1fr;
+      gap: var(--space-1);
+      padding-block: var(--space-4);
+    }
+    .profile-actions {
+      display: grid;
+      gap: var(--space-2);
+    }
+  }
+
+  @media (max-width: 420px) {
+    .hero-layout {
+      padding-block: var(--space-4);
+    }
+    .hero-kicker {
+      max-width: 31ch;
+    }
+    .hero-text h1 {
+      margin-top: var(--space-3);
+    }
+    .hero-actions {
+      margin-top: var(--space-4);
+    }
+    .hero-actions {
+      display: grid;
+    }
+    .hero-portrait {
+      width: min(58vw, 12rem);
+      margin-top: var(--space-5);
+    }
+    .section-head h2,
+    .profile-copy h2 {
+      font-size: 2.65rem;
+    }
+    .method-statement h2 {
+      font-size: 3rem;
+    }
+  }
+
+  .system-bridge {
+    --phi-1: 1rem;
+    --phi-2: 1.618rem;
+    --phi-3: 2.618rem;
+    --phi-4: 4.236rem;
+    --phi-5: 6.854rem;
+    --tagline-opacity: 1;
+    --tagline-tracking: -0.055em;
+    --beyond-x: 0px;
+    --systems-x: 0px;
+    --philosophy-opacity: 0;
+    --philosophy-y: 18px;
+    min-height: 300svh;
+    position: relative;
+    overflow: clip;
+    color: var(--ink);
+    background: var(--canvas);
+  }
+  .bridge-inner {
+    height: 100svh;
+    position: sticky;
+    top: 0;
+    display: grid;
+    align-items: center;
+    padding-block: var(--home-section-pad);
+  }
+  .bridge-phase {
+    grid-area: 1 / 1;
+    width: 100%;
+  }
+  .bridge-tagline {
+    opacity: var(--tagline-opacity);
+    pointer-events: none;
+    will-change: opacity;
+  }
+  .bridge-tagline h2 {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: clamp(var(--phi-4), 7.6vw, var(--phi-5));
+    font-weight: 350;
+    line-height: 0.88;
+    letter-spacing: var(--tagline-tracking);
+  }
+  .tagline-line {
+    display: block;
+    white-space: nowrap;
+    will-change: transform;
+  }
+  .tagline-line--beyond {
+    transform: translate3d(var(--beyond-x), 0, 0);
+  }
+  .tagline-line--systems {
+    padding-left: clamp(var(--phi-2), 9vw, 8rem);
+    color: var(--rust);
+    transform: translate3d(var(--systems-x), 0, 0);
+  }
+
+  .engineering-philosophy {
+    opacity: var(--philosophy-opacity);
+    transform: translate3d(0, var(--philosophy-y), 0);
+    will-change: opacity, transform;
+  }
+  .philosophy-layout {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--grid-gap);
+    align-items: start;
+  }
+  .philosophy-layout > h2 {
+    grid-column: 1 / span 5;
+    max-width: 8ch;
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--phi-4);
+    font-weight: 350;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+  .philosophy-list {
+    grid-column: 6 / -1;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--ink);
+  }
+  .philosophy-list li {
+    display: grid;
+    grid-template-columns: minmax(13rem, 0.9fr) 1.1fr;
+    gap: var(--space-5);
+    align-items: baseline;
+    padding-block: var(--phi-2);
+    border-bottom: 1px solid var(--rule);
+    clip-path: inset(var(--principle-clip, 100%) 0 0);
+    transform: translate3d(0, var(--principle-y, 18px), 0);
+    will-change: clip-path, transform;
+  }
+  .philosophy-list h3 {
+    font-family: var(--font-body);
+    font-size: var(--phi-2);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+  }
+  .philosophy-list p {
+    color: var(--ink-soft);
+    font-size: var(--phi-1);
+    line-height: 1.55;
+  }
+
+  .selected-work {
+    min-height: 200svh;
+    position: relative;
+    overflow: clip;
+    background: var(--canvas);
+  }
+  .gallery-sticky {
+    height: 100svh;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: grid;
+    align-items: center;
+  }
+  .gallery-inner {
+    padding-block: clamp(2.5rem, 5vh, 4rem);
+  }
+  .gallery-heading {
+    width: 100%;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-6);
+  }
+  .gallery-heading h2,
+  .method-heading h2 {
+    margin-top: var(--space-4);
+    font-family: var(--font-editorial);
+    font-size: clamp(3rem, 4.4vw, 4.5rem);
+    font-weight: 400;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+  }
+  .gallery-heading .all-work {
+    width: auto;
+    min-width: 12rem;
+    margin: 0;
+    padding: 0;
+  }
+  .gallery-rows {
+    display: grid;
+    gap: var(--grid-gap);
+    margin-top: var(--space-6);
+  }
+  .gallery-row {
+    display: grid;
+    gap: var(--grid-gap);
+    will-change: transform;
+  }
+  .gallery-row--first {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    transform: translate3d(var(--gallery-row-first-x, 0px), 0, 0);
+  }
+  .gallery-row--second {
+    width: calc((100% - var(--grid-gap)) * 2 / 3);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-self: end;
+    transform: translate3d(var(--gallery-row-second-x, 0px), 0, 0);
+  }
+  .work-card {
+    min-width: 0;
+  }
+  .work-card__inner {
+    height: 100%;
+    display: block;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: var(--canvas);
+    color: var(--ink);
+    text-decoration: none;
+    transition:
+      transform var(--transition-fast),
+      border-color var(--transition-fast);
+  }
+  a.work-card__inner:hover {
+    transform: translateY(-2px);
+    border-color: var(--blue);
+  }
+  a.work-card__inner:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: -4px;
+  }
+  .work-card__visual {
+    overflow: hidden;
+    border-bottom: 1px solid var(--rule);
+    background: #ebe8e1;
+  }
+  .work-card__visual :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 7;
+    display: block;
+    object-fit: cover;
+    transition: transform 600ms ease;
+  }
+  a.work-card__inner:hover .work-card__visual :global(img) {
+    transform: scale(1.025);
+  }
+  .work-card__body {
+    padding: var(--space-4);
+  }
+  .work-card h3 {
+    min-height: 2.15em;
+    font-family: var(--font-editorial);
+    font-size: clamp(1.15rem, 1.6vw, 1.45rem);
+    font-weight: 400;
+    line-height: 1.08;
+  }
+  .work-card ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    margin: var(--space-3) 0 0;
+    padding: 0;
+  }
+  .work-card li {
+    padding: 0.28rem 0.5rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface-strong);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+  }
+
+  .method-section {
+    min-height: 100svh;
+  }
+  .method-layout {
+    align-items: start;
+    gap: var(--grid-gap);
+    padding-block: var(--home-section-pad);
+  }
+  .method-heading h2 {
+    max-width: 10ch;
+  }
+  .timeline {
+    position: relative;
+  }
+  .timeline-progress {
+    width: 2px;
+    position: absolute;
+    top: 3.5rem;
+    bottom: 3.5rem;
+    left: 0.3rem;
+    z-index: 1;
+    background: var(--rust);
+    transform: scaleY(var(--timeline-progress, 0));
+    transform-origin: top;
+  }
+  .method-steps li {
+    opacity: 1;
+  }
+  .method-steps .method-node {
+    background: var(--canvas);
+    transition:
+      background-color 240ms ease,
+      transform 240ms ease;
+  }
+  .method-steps li.is-active .method-node {
+    background: var(--rust);
+    transform: scale(1.12);
+  }
+
+  @media (min-width: 1200px) {
+    .selected-work {
+      min-height: 200svh;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .method-layout {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+    .method-heading {
+      grid-column: 1 / span 6;
+    }
+    .timeline {
+      grid-column: 7 / -1;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .editorial-home {
+      --home-section-pad: 3.5rem;
+    }
+    .system-bridge {
+      min-height: 300svh;
+    }
+    .bridge-inner {
+      height: 100svh;
+    }
+    .bridge-tagline h2 {
+      font-size: var(--phi-3);
+      line-height: 0.94;
+    }
+    .tagline-line--systems {
+      padding-left: var(--phi-2);
+    }
+    .philosophy-layout {
+      grid-template-columns: 1fr;
+    }
+    .philosophy-layout > h2,
+    .philosophy-list {
+      grid-column: 1;
+    }
+    .philosophy-layout > h2 {
+      max-width: 9ch;
+      font-size: var(--phi-3);
+    }
+    .philosophy-list {
+      margin-top: var(--phi-3);
+    }
+    .philosophy-list li {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      padding-block: 1.15rem;
+    }
+    .philosophy-list h3 {
+      font-size: clamp(1.25rem, 5.4vw, var(--phi-2));
+    }
+    .selected-work {
+      min-height: 200svh;
+    }
+    .gallery-heading {
+      display: grid;
+      align-items: start;
+    }
+    .gallery-heading .all-work {
+      min-width: 0;
+    }
+    .gallery-heading h2,
+    .method-heading h2 {
+      font-size: 2.75rem;
+    }
+    .gallery-rows {
+      gap: var(--space-3);
+      margin-top: var(--space-5);
+    }
+    .gallery-row,
+    .gallery-row--second {
+      width: max-content;
+      display: flex;
+      gap: var(--space-3);
+      justify-self: start;
+    }
+    .work-card {
+      width: min(72vw, 17rem);
+      flex: none;
+    }
+    .work-card__visual :global(img) {
+      aspect-ratio: 16 / 8;
+    }
+    .work-card h3 {
+      font-size: 1.05rem;
+    }
+    .method-layout {
+      padding-block: var(--home-section-pad);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .petals {
+      display: none;
+    }
+    .system-bridge {
+      min-height: auto;
+    }
+    .bridge-inner {
+      height: auto;
+      position: relative;
+      display: block;
+    }
+    .bridge-phase,
+    .philosophy-list li {
+      opacity: 1;
+      transform: none;
+    }
+    .philosophy-list li {
+      clip-path: none;
+    }
+    .tagline-line {
+      transform: none;
+    }
+    .engineering-philosophy {
+      margin-top: clamp(6rem, 16vh, 10rem);
+    }
+    .selected-work {
+      min-height: auto;
+    }
+    .gallery-sticky {
+      height: auto;
+      min-height: 100svh;
+      position: relative;
+    }
+    .gallery-row {
+      transform: none;
+    }
+    .method-steps li {
+      opacity: 1;
+    }
+    .timeline-progress {
+      transform: scaleY(1);
+    }
+  }
+
+  @media (scripting: none) {
+    .system-bridge {
+      min-height: auto;
+    }
+    .bridge-inner {
+      height: auto;
+      position: relative;
+      display: block;
+    }
+    .bridge-phase,
+    .philosophy-list li {
+      opacity: 1;
+      transform: none;
+    }
+    .philosophy-list li {
+      clip-path: none;
+    }
+    .tagline-line {
+      transform: none;
+    }
+    .engineering-philosophy {
+      margin-top: clamp(6rem, 16vh, 10rem);
+    }
+    .selected-work {
+      min-height: auto;
+    }
+    .gallery-sticky {
+      height: auto;
+      min-height: 100svh;
+      position: relative;
+    }
+    .gallery-row {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const animatePetals = (canvas: HTMLCanvasElement) => {
+    const context = canvas.getContext('2d');
+    const isFooter = canvas.dataset.petals === 'footer';
+    const petalCount = window.innerWidth < 640 ? (isFooter ? 5 : 6) : isFooter ? 8 : 10;
+    const petals = Array.from({ length: petalCount }, (_, index) => ({
+      x: (index + 0.65) / petalCount,
+      size: (isFooter ? 18 : 11) + (index % 4) * (isFooter ? 5 : 3),
+      duration: 14000 + (index % 6) * 1800,
+      offset: (index % 5) * 1700,
+      sway: 22 + (index % 3) * 14,
+      opacity: (isFooter ? 0.2 : 0.3) + (index % 3) * 0.08,
+    }));
+    const start = performance.now();
+
+    const resize = () => {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      const bounds = canvas.getBoundingClientRect();
+      canvas.width = Math.round(bounds.width * ratio);
+      canvas.height = Math.round(bounds.height * ratio);
+      context?.setTransform(ratio, 0, 0, ratio, 0, 0);
+    };
+
+    const draw = (now: number) => {
+      if (!context) return;
+      const bounds = canvas.getBoundingClientRect();
+      context.clearRect(0, 0, bounds.width, bounds.height);
+      let active = false;
+
+      petals.forEach((petal, index) => {
+        const rawProgress = (now - start + petal.offset) / petal.duration;
+        const progress = isFooter ? rawProgress % 1 : Math.min(rawProgress, 1);
+        if (progress >= 1) return;
+        active = isFooter || progress < 1;
+        const eased = progress * progress * (3 - 2 * progress);
+        const x = petal.x * bounds.width + Math.sin(progress * Math.PI * 3 + index) * petal.sway;
+        const y = -30 + eased * (bounds.height + 60);
+
+        context.save();
+        context.translate(x, y);
+        context.rotate(progress * Math.PI * 2 + index * 0.4);
+        const exitFade = Math.max(0, Math.min(1, (0.78 - progress) / 0.18));
+        context.globalAlpha = petal.opacity * exitFade;
+        context.fillStyle = '#d8a7ad';
+        context.beginPath();
+        context.ellipse(0, 0, petal.size * 0.55, petal.size, 0.45, 0, Math.PI * 2);
+        context.fill();
+        context.restore();
+      });
+
+      if (active) requestAnimationFrame(draw);
+    };
+
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+    requestAnimationFrame(draw);
+  };
+
+  if (!reduceMotion) {
+    document
+      .querySelectorAll<HTMLCanvasElement>('.editorial-home .petal-canvas')
+      .forEach((canvas) => {
+        if (canvas.dataset.petals === 'footer' && 'IntersectionObserver' in window) {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              if (!entries.some((entry) => entry.isIntersecting)) return;
+              observer.disconnect();
+              animatePetals(canvas);
+            },
+            { rootMargin: '120px' },
+          );
+          observer.observe(canvas);
+        } else {
+          animatePetals(canvas);
+        }
+      });
+  }
+
+  const bridge = document.querySelector<HTMLElement>('[data-scroll-bridge]');
+  const gallery = document.querySelector<HTMLElement>('[data-scroll-gallery]');
+  const galleryFirstRow = gallery?.querySelector<HTMLElement>('[data-gallery-row="first"]');
+  const gallerySecondRow = gallery?.querySelector<HTMLElement>('[data-gallery-row="second"]');
+  const philosophySteps = bridge
+    ? [...bridge.querySelectorAll<HTMLElement>('[data-philosophy-step]')]
+    : [];
+  const timeline = document.querySelector<HTMLElement>('[data-method-timeline]');
+  const timelineSteps = timeline
+    ? [...timeline.querySelectorAll<HTMLElement>('[data-timeline-step]')]
+    : [];
+
+  if (!reduceMotion && (bridge || gallery || timeline)) {
+    let scheduled = false;
+    const clamp = (value: number) => Math.max(0, Math.min(1, value));
+    const smoothstep = (start: number, end: number, value: number) => {
+      const progress = clamp((value - start) / (end - start));
+      return progress * progress * (3 - 2 * progress);
+    };
+
+    const updateScrollMoments = () => {
+      scheduled = false;
+      const viewHeight = window.innerHeight;
+
+      if (bridge) {
+        const bounds = bridge.getBoundingClientRect();
+        const scrollRange = Math.max(1, bounds.height - viewHeight);
+        const journey = clamp(-bounds.top / scrollRange);
+        const taglineMotion = smoothstep(0.04, 0.31, journey);
+        const taglineOpacity = 1 - smoothstep(0.18, 0.31, journey);
+        const philosophyVisible = journey >= 0.32 ? 1 : 0;
+
+        bridge.style.setProperty('--tagline-opacity', taglineOpacity.toFixed(3));
+        bridge.style.setProperty('--beyond-x', `${(-48 * taglineMotion).toFixed(2)}px`);
+        bridge.style.setProperty('--systems-x', `${(48 * taglineMotion).toFixed(2)}px`);
+        bridge.style.setProperty(
+          '--tagline-tracking',
+          `${(-0.055 + taglineMotion * 0.03).toFixed(4)}em`,
+        );
+        bridge.style.setProperty('--philosophy-opacity', String(philosophyVisible));
+        bridge.style.setProperty('--philosophy-y', philosophyVisible ? '0px' : '18px');
+
+        philosophySteps.forEach((step, index) => {
+          const reveal = smoothstep(0.34 + index * 0.025, 0.42 + index * 0.025, journey);
+          step.style.setProperty('--principle-clip', `${((1 - reveal) * 100).toFixed(2)}%`);
+          step.style.setProperty('--principle-y', `${((1 - reveal) * 18).toFixed(2)}px`);
+        });
+      }
+
+      if (gallery && galleryFirstRow && gallerySecondRow) {
+        const bounds = gallery.getBoundingClientRect();
+        const scrollRange = Math.max(1, bounds.height - viewHeight);
+        const journey = clamp(-bounds.top / scrollRange);
+        const firstReveal = smoothstep(0.04, 0.78, journey);
+        const secondReveal = smoothstep(0.16, 0.92, journey);
+        const mobile = window.innerWidth < 768;
+        const firstTravel = mobile
+          ? Math.max(window.innerWidth, galleryFirstRow.scrollWidth - window.innerWidth + 40)
+          : Math.min(window.innerWidth * 0.62, 720);
+        const secondTravel = mobile ? window.innerWidth : Math.min(window.innerWidth * 0.62, 720);
+        const secondFinal = mobile
+          ? -Math.max(0, gallerySecondRow.scrollWidth - window.innerWidth + 40)
+          : 0;
+        const firstX = -firstTravel * (1 - firstReveal);
+        const secondX = secondTravel + (secondFinal - secondTravel) * secondReveal;
+
+        gallery.style.setProperty('--gallery-row-first-x', `${firstX.toFixed(2)}px`);
+        gallery.style.setProperty('--gallery-row-second-x', `${secondX.toFixed(2)}px`);
+      }
+
+      if (timeline) {
+        const bounds = timeline.getBoundingClientRect();
+        const progress = clamp((viewHeight * 0.78 - bounds.top) / (bounds.height * 0.82));
+        timeline.style.setProperty('--timeline-progress', progress.toFixed(3));
+        timelineSteps.forEach((step, index) => {
+          const threshold = index / Math.max(1, timelineSteps.length - 1);
+          step.classList.toggle('is-active', progress >= threshold * 0.9);
+        });
+      }
+    };
+
+    const scheduleScrollMoments = () => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(updateScrollMoments);
+    };
+
+    window.addEventListener('scroll', scheduleScrollMoments, { passive: true });
+    window.addEventListener('resize', scheduleScrollMoments, { passive: true });
+    updateScrollMoments();
+  } else {
+    timelineSteps.forEach((step) => step.classList.add('is-active'));
+  }
+</script>
