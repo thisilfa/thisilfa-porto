@@ -39,6 +39,16 @@ export const projectSchema = z.object({
     .optional(),
   /** Slug of the architecture diagram component rendered by the case-study page. */
   diagram: z.string().optional(),
+  /** A displayed metric remains inseparable from its definition and limits. */
+  evidence: z
+    .object({
+      value: z.string(),
+      label: z.string(),
+      definition: z.string(),
+      scope: z.string(),
+      caveat: z.string(),
+    })
+    .optional(),
 });
 
 export type ProjectData = z.infer<typeof projectSchema>;

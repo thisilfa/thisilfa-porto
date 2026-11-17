@@ -15,6 +15,12 @@ featured: true
 order: 1
 period: July 2025 – Present
 diagram: sims
+evidence:
+  value: 98.6%
+  label: Peak average daily item-counting correctness
+  definition: Detected inventory counts compared with actual inventory quantities.
+  scope: Deployed shelves, reported in October; reporting year unconfirmed.
+  caveat: Operational counting metric, not a model accuracy figure, and not evidence of generalization to unseen environments.
 contribution:
   - group: implemented
     items:
@@ -34,7 +40,7 @@ contribution:
   - group: unattributed
     items:
       - Camera setup and image acquisition; frontend, dashboard, and reporting layer.
-      - Amazon S3 storage — part of the wider system, not personally implemented.
+      - Amazon S3 storage (part of the wider system, not personally implemented).
 ---
 
 ## Problem and constraints
@@ -49,11 +55,11 @@ the model's benefit.
 
 The constraints that shaped the solution:
 
-- **Occlusion by stacking** — most boxes in a tower are hidden; any usable count must infer
+- **Occlusion by stacking:** most boxes in a tower are hidden; any usable count must infer
   what it cannot see.
-- **Edge hardware** — capture runs on Raspberry Pi 4 devices with limited memory, on which
+- **Edge hardware:** capture runs on Raspberry Pi 4 devices with limited memory, on which
   large models are slow and unstable.
-- **Operational requirements** — counts must arrive continuously, errors must be reviewable by
+- **Operational requirements:** counts must arrive continuously, errors must be reviewable by
   staff, and the system runs inside the hospital's existing infrastructure (MQTT, AWS).
 
 ## System architecture
@@ -61,7 +67,7 @@ The constraints that shaped the solution:
 The diagram above shows the generalized flow. Seven cameras across seven shelves feed four
 Raspberry Pi 4 devices that capture shelf images every 30 minutes and on quantity-change
 events. YOLOv8 segmentation identifies the visible surfaces of stacked boxes, and geometry-
-and spatial-reasoning-based counting — explicitly not a full 3D reconstruction — estimates
+and spatial-reasoning-based counting (explicitly not a full 3D reconstruction) estimates
 the full count, including the boxes it cannot directly see. A FastAPI inference service with
 Redis-based queue processing handles the inference workflow and hands results to the
 inventory system. MQTT connects the devices to the existing infrastructure, and the cloud
@@ -76,11 +82,11 @@ weights, identify the visible surfaces of stacked boxes. Requirement: a count th
 occlusion. Approach: count visible top surfaces and infer hidden boxes from bounding-box
 coordinates, adjacency, and the spatial relationships between detections. Outcome: usable
 counts from partially visible towers, with failures concentrated in cases of extreme
-occlusion — which is exactly where the targeted data collection (below) went.
+occlusion. That is where the targeted data collection below was directed.
 
 **Centralized inference.** Requirement: YOLO loading duplicated on every Raspberry Pi made the
-edge devices slow and unstable. Approach: a centralized FastAPI inference server — proposed
-and implemented personally — so edge devices capture and stream while inference happens on
+edge devices slow and unstable. Approach: a centralized FastAPI inference server, proposed
+and implemented personally, so edge devices capture and stream while inference happens on
 stronger hardware, with Redis-based queue processing between capture and inference. Outcome:
 relief for the edge devices and a single place to monitor model behavior.
 
@@ -88,7 +94,7 @@ relief for the edge devices and a single place to monitor model behavior.
 monitored against reviewed discrepancies, and failures were categorized as model-related,
 counting-logic-related, or environmental (for example occlusion or overexposure) before any
 fix was attempted. The documented dataset: fewer than 500 images (roughly 800 annotation
-"instances" — the exact meaning of that count is unconfirmed), annotated in Roboflow, with
+"instances"; the exact meaning of that count is unconfirmed), annotated in Roboflow, with
 class imbalance addressed during preparation. Augmentations included rotation, flipping,
 brightness/contrast and exposure changes, plus selective random cutout on less than 3% of
 the training data. Training monitored loss and mAP; testing covered segmentation-mask
@@ -110,17 +116,13 @@ available.
 - **Edge instability.** One Raspberry Pi ran the same program twice for two cameras, loading
   YOLO twice and contributing to resource inefficiency and crashes. Documented action: a
   proposal to move inference to an AWS-hosted server while the Pi devices capture and send
-  images — with the FastAPI inference server, YOLO integration, and Redis task processing
+  images, while the FastAPI inference server, YOLO integration, and Redis task processing
   personally implemented. The documentation does not record the proposal's adoption or its
   measured effect, so none is claimed.
 
 ## Results and evaluation
 
-Peak average daily item-counting correctness of 98.6% in October, measured by comparing
-detected inventory counts against actual inventory quantities. This is an operational
-counting metric — item counts versus actual inventory — not a model accuracy figure; the
-year of the October reporting is unconfirmed. Beyond the metric: deployed across multiple
-Raspberry Pi devices, supporting multi-camera monitoring and periodic automatic replenishment
+The system was deployed across multiple Raspberry Pi devices, supporting multi-camera monitoring and periodic automatic replenishment
 (PAR), with monthly reports covering accuracy, PAR performance, failure categories, and
 improvements.
 

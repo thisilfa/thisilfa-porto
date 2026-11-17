@@ -37,6 +37,7 @@ const isCaseStudy = entry.data.kind === 'case-study';
     {entry.data.period && <span class="period">{entry.data.period}</span>}
     <span class="status status-{entry.data.statusKind}">{entry.data.statusKind}</span>
   </p>
+  <div class="system-mark" role="img" aria-label={`${entry.data.title} system flow`}><i></i><i></i><i></i><i></i></div>
   <h3>{isCaseStudy ? <a href={href}>{entry.data.title}</a> : entry.data.title}</h3>
   <p class="overview">{entry.data.overview}</p>
   <ul class="stack">
@@ -54,31 +55,32 @@ const isCaseStudy = entry.data.kind === 'case-study';
 
 <style>
   .card {
-    background: var(--surface-1);
+    background: transparent;
     border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     padding: var(--space-5);
     display: grid;
     gap: var(--space-3);
     align-content: start;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto auto 1fr;
     transition:
       border-color var(--transition-fast),
-      box-shadow var(--transition-fast);
+      transform var(--transition-fast), background var(--transition-fast);
   }
 
   .card:hover {
     border-color: var(--border-strong);
-    box-shadow: var(--glow-violet);
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
   }
 
   h3 {
-    font-size: var(--text-xl);
+    font-size: clamp(1.45rem, 1.8vw, 2rem);
   }
 
   h3 a {
-    color: var(--text-high);
-    text-decoration: none;
+    color: var(--p-ink);
+    text-decoration-color: transparent;
   }
 
   h3 a:hover {
@@ -96,7 +98,6 @@ const isCaseStudy = entry.data.kind === 'case-study';
   .category {
     color: var(--text-muted);
     letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   .period {
@@ -104,25 +105,24 @@ const isCaseStudy = entry.data.kind === 'case-study';
   }
 
   .status {
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--border-subtle);
-    padding: 0 var(--space-2);
+    border-left: 1px solid var(--border-subtle);
+    padding-left: var(--space-2);
   }
 
   .status-delivered {
     color: var(--neon-cyan);
-    border-color: rgba(76, 201, 240, 0.45);
+    border-color: var(--border-subtle);
   }
 
   .status-staging {
     color: var(--neon-violet);
-    border-color: rgba(157, 107, 255, 0.45);
+    border-color: var(--border-subtle);
   }
 
   .status-research,
   .status-unverified {
     color: var(--neon-pumpkin);
-    border-color: rgba(255, 171, 94, 0.45);
+    border-color: var(--border-subtle);
   }
 
   .overview {
@@ -142,14 +142,13 @@ const isCaseStudy = entry.data.kind === 'case-study';
   .stack li {
     font-size: var(--text-xs);
     color: var(--text-muted);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-pill);
-    padding: 0 var(--space-2);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.15rem 0;
   }
 
   .disclosure {
     font-size: var(--text-xs);
-    color: var(--text-muted);
+    color: var(--p-ink);
     border-top: 1px solid var(--border-subtle);
     padding-top: var(--space-3);
   }
@@ -162,5 +161,49 @@ const isCaseStudy = entry.data.kind === 'case-study';
     font-size: var(--text-sm);
     font-family: var(--font-mono);
     text-decoration: none;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .system-mark {
+    height: 8.8rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    align-items: center;
+    gap: 0.65rem;
+    padding: 1.25rem;
+    background: var(--p-ink);
+    border-radius: var(--radius-sm);
+  }
+
+  .system-mark i {
+    display: block;
+    height: 0.7rem;
+    background: var(--p-bg);
+    border-radius: 1px;
+    position: relative;
+  }
+
+  .system-mark i::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 1px;
+    height: 1rem;
+    background: var(--p-accent);
+  }
+
+  .system-mark i:nth-child(2) { height: 2.3rem; background: #d2b46f; }
+  .system-mark i:nth-child(3) { height: 3.6rem; background: var(--p-accent); }
+  .system-mark i:nth-child(4) { height: 1.5rem; }
+
+  @media (max-width: 639px) {
+    h3 a {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+    }
   }
 </style>

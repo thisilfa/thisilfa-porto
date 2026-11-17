@@ -15,6 +15,12 @@ featured: true
 order: 1
 period: Juli 2025 – sekarang
 diagram: sims
+evidence:
+  value: 98,6%
+  label: Akurasi penghitungan item harian rata-rata puncak
+  definition: Jumlah inventaris hasil deteksi dibandingkan dengan kuantitas inventaris aktual.
+  scope: Rak yang terdeploy, dilaporkan pada Oktober; tahun pelaporan belum terkonfirmasi.
+  caveat: Metrik penghitungan operasional, bukan angka akurasi model, dan bukan bukti generalisasi ke lingkungan yang belum terlihat.
 contribution:
   - group: implemented
     items:
@@ -34,7 +40,7 @@ contribution:
   - group: unattributed
     items:
       - Penyiapan kamera dan akuisisi citra; frontend, dashboard, dan lapisan pelaporan.
-      - Penyimpanan Amazon S3 — bagian dari sistem yang lebih luas, bukan implementasi pribadi.
+      - Penyimpanan Amazon S3 (bagian dari sistem yang lebih luas, bukan implementasi pribadi).
 ---
 
 ## Masalah dan kendala
@@ -49,11 +55,11 @@ sakit tidak bisa ditata demi kepentingan model.
 
 Kendala yang membentuk solusinya:
 
-- **Oklusi akibat penumpukan** — sebagian besar kotak dalam menara tersembunyi; penghitungan
+- **Oklusi akibat penumpukan:** sebagian besar kotak dalam menara tersembunyi; penghitungan
   yang berguna harus menyimpulkan apa yang tidak terlihat.
-- **Perangkat keras edge** — pengambilan citra berjalan di Raspberry Pi 4 berkapasitas terbatas,
+- **Perangkat keras edge:** pengambilan citra berjalan di Raspberry Pi 4 berkapasitas terbatas,
   tempat model besar lambat dan tidak stabil.
-- **Kebutuhan operasional** — jumlah harus terus-menerus masuk, kesalahan harus bisa ditinjau
+- **Kebutuhan operasional:** jumlah harus terus-menerus masuk, kesalahan harus bisa ditinjau
   staf, dan sistem berjalan di dalam infrastruktur rumah sakit yang sudah ada (MQTT, AWS).
 
 ## Arsitektur sistem
@@ -61,8 +67,8 @@ Kendala yang membentuk solusinya:
 Diagram di atas menunjukkan alur umumnya. Tujuh kamera di tujuh rak mengirim citra ke empat
 perangkat Raspberry Pi 4 yang mengambil gambar rak setiap 30 menit dan saat peristiwa
 perubahan jumlah terdeteksi. Segmentasi YOLOv8 mengidentifikasi permukaan kotak bertumpuk
-yang terlihat, dan penghitungan berbasis geometri dan penalaran spasial — secara eksplisit
-bukan rekonstruksi 3D penuh — memperkirakan jumlah total, termasuk kotak yang tidak dapat
+yang terlihat, dan penghitungan berbasis geometri dan penalaran spasial (secara eksplisit
+bukan rekonstruksi 3D penuh) memperkirakan jumlah total, termasuk kotak yang tidak dapat
 dilihat langsung. Layanan inferensi FastAPI dengan pemrosesan antrian berbasis Redis menangani
 alur kerja inferensi dan menyerahkan hasilnya ke sistem inventaris. MQTT menghubungkan
 perangkat ke infrastruktur yang ada, dan tier cloud berjalan di AWS, tempat pendekatan
@@ -76,11 +82,11 @@ pretrained, mengidentifikasi permukaan kotak bertumpuk yang terlihat. Kebutuhan:
 bertahan terhadap oklusi. Pendekatan: hitung permukaan atas yang terlihat dan simpulkan kotak
 tersembunyi dari koordinat bounding-box, ketetanggaan, dan relasi spasial antar deteksi.
 Hasil: hitungan yang berguna dari menara sebagian terlihat, dengan kegagalan terkonsentrasi
-pada kasus oklusi ekstrem — tepat di mana pengumpulan data tertarget (di bawah) diarahkan.
+pada kasus oklusi ekstrem. Pengumpulan data tertarget di bawah diarahkan ke kasus tersebut.
 
 **Inferensi terpusat.** Kebutuhan: pemuatan YOLO yang duplikat di setiap Raspberry Pi membuat
-perangkat edge lambat dan tidak stabil. Pendekatan: server inferensi FastAPI terpusat —
-diusulkan dan diimplementasikan sendiri — sehingga perangkat edge menangkap dan mengirim,
+perangkat edge lambat dan tidak stabil. Pendekatan: server inferensi FastAPI terpusat,
+diusulkan dan diimplementasikan sendiri, sehingga perangkat edge menangkap dan mengirim,
 sementara inferensi berjalan di perangkat keras yang lebih kuat, dengan pemrosesan antrian
 berbasis Redis antara pengambilan dan inferensi. Hasil: beban edge berkurang dan ada satu
 tempat terpusat untuk memantau perilaku model.
@@ -89,7 +95,7 @@ tempat terpusat untuk memantau perilaku model.
 dipantau terhadap ketidaksesuaian yang ditinjau, dan kegagalan dikategorikan sebagai terkait
 model, terkait logika penghitungan, atau lingkungan (misalnya oklusi atau overexposure)
 sebelum ada perbaikan dicoba. Dataset terdokumentasi: kurang dari 500 citra (sekitar 800
-"instance" anotasi — makna tepat dari angka itu belum terkonfirmasi), dianotasi di Roboflow,
+"instance" anotasi; makna tepat dari angka itu belum terkonfirmasi), dianotasi di Roboflow,
 dengan ketidakseimbangan kelas ditangani saat preparasi. Augmentasi mencakup rotasi,
 pembalikan, perubahan brightness/contrast dan exposure, plus random cutout selektif pada
 kurang dari 3% data pelatihan. Pelatihan memantau loss dan mAP; pengujian mencakup evaluasi
@@ -112,17 +118,13 @@ tersedia.
 - **Ketidakstabilan edge.** Satu Raspberry Pi menjalankan program yang sama dua kali untuk dua
   kamera, memuat YOLO dua kali dan berkontribusi pada inefisiensi sumber daya serta crash.
   Tindakan terdokumentasi: usulan untuk memindahkan inferensi ke server yang di-host di AWS
-  sementara perangkat Pi menangkap dan mengirim citra — dengan server inferensi FastAPI,
+  sementara perangkat Pi menangkap dan mengirim citra, dengan server inferensi FastAPI,
   integrasi YOLO, dan pemrosesan antrian Redis diimplementasikan sendiri. Dokumentasi tidak
   mencatat adopsi usulan tersebut maupun efek terukurnya, sehingga keduanya tidak diklaim.
 
 ## Hasil dan evaluasi
 
-Akurasi penghitungan harian rata-rata puncak sebesar 98,6% pada Oktober, diukur dengan
-membandingkan jumlah inventaris hasil deteksi terhadap kuantitas inventaris aktual. Ini adalah
-metrik penghitungan operasional — jumlah item versus inventaris aktual — bukan angka akurasi
-model; tahun pelaporan Oktober tersebut belum terkonfirmasi. Di luar metrik: terdeploy di
-beberapa perangkat Raspberry Pi, mendukung pemantauan multi-kamera dan pengisian otomatis
+Sistem terdeploy di beberapa perangkat Raspberry Pi, mendukung pemantauan multi-kamera dan pengisian otomatis
 berkala (PAR), dengan laporan bulanan mencakup akurasi, performa PAR, kategori kegagalan, dan
 perbaikan.
 

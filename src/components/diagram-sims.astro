@@ -1,284 +1,233 @@
 ---
-/**
- * SIMS architecture diagram — generalized, ownership-encoded inline SVG.
- * Three treatments: implemented stages (solid, magenta accent), contributed
- * integration points (dashed, violet), and context stages that the source
- * material does not attribute (muted). Stage labels stay in technical
- * English (language-neutral); the title, description, legend, and scroll
- * hint are localized props. Zero client JavaScript — pure inline SVG.
- */
 interface Props {
   lang: 'en' | 'id';
   title: string;
   desc: string;
   legend: { implemented: string; integration: string; context: string };
-  scrollHint: string;
+  scrollHint?: string;
+  compact?: boolean;
 }
 
-const { title, desc, legend, scrollHint } = Astro.props;
+const { lang, title, desc, legend, compact = false } = Astro.props;
+const isId = lang === 'id';
+
+const phases = isId
+  ? [
+      {
+        title: '01 · Akuisisi',
+        nodes: [
+          ['context', 'Tujuh kamera di rak', 'Citra rak setiap 30 menit dan saat kuantitas berubah'],
+          ['context', 'Empat Raspberry Pi 4', 'Perangkat edge menangkap dan mengirim citra'],
+          ['integration', 'MQTT', 'Integrasi dengan infrastruktur yang sudah ada'],
+        ],
+      },
+      {
+        title: '02 · Inferensi',
+        nodes: [
+          ['implemented', 'Antrian tugas Redis', 'Pemrosesan tugas antara capture dan inferensi'],
+          ['implemented', 'Layanan inferensi FastAPI', 'Server terpusat dan integrasi pipeline YOLO'],
+          ['implemented', 'Segmentasi YOLOv8', 'Mendeteksi permukaan kotak yang terlihat'],
+          ['implemented', 'Logika penghitungan geometri', 'Menyimpulkan kotak tersembunyi dari relasi spasial'],
+        ],
+      },
+      {
+        title: '03 · Hasil',
+        nodes: [
+          ['implemented', 'Hasil dan pemantauan deteksi', 'Tinjauan ketidaksesuaian dan performa harian'],
+          ['integration', 'Sistem inventaris', 'Layanan inferensi terhubung ke sistem yang lebih luas'],
+          ['integration', 'Deployment AWS', 'Dikerjakan bersama tim infrastruktur'],
+        ],
+      },
+    ]
+  : [
+      {
+        title: '01 · Capture',
+        nodes: [
+          ['context', 'Seven shelf cameras', 'Shelf images every 30 minutes and on quantity-change events'],
+          ['context', 'Four Raspberry Pi 4 devices', 'Edge devices capture and send images'],
+          ['integration', 'MQTT', 'Integration with the existing infrastructure'],
+        ],
+      },
+      {
+        title: '02 · Inference',
+        nodes: [
+          ['implemented', 'Redis task queue', 'Task processing between capture and inference'],
+          ['implemented', 'FastAPI inference service', 'Centralized server and YOLO pipeline integration'],
+          ['implemented', 'YOLOv8 segmentation', 'Detects the visible surfaces of stacked boxes'],
+          ['implemented', 'Geometry counting logic', 'Infers hidden boxes from spatial relationships'],
+        ],
+      },
+      {
+        title: '03 · Delivery',
+        nodes: [
+          ['implemented', 'Results and detection monitoring', 'Daily discrepancy and performance review'],
+          ['integration', 'Inventory system', 'Inference service integrated into the wider system'],
+          ['integration', 'AWS deployment', 'Completed with the infrastructure team'],
+        ],
+      },
+    ];
 ---
 
-<figure class="diagram-figure">
-  <div class="diagram-scroll">
-    <svg
-      role="img"
-      viewBox="0 0 960 300"
-      width="960"
-      height="300"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-labelledby="sims-diagram-title sims-diagram-desc"
-      class="diagram"
-    >
-      <title id="sims-diagram-title">{title}</title>
-      <desc id="sims-diagram-desc">{desc}</desc>
-      <defs>
-        <marker
-          id="arrow"
-          viewBox="0 0 10 10"
-          refX="9"
-          refY="5"
-          markerWidth="7"
-          markerHeight="7"
-          orient="auto-start-reverse"
-        >
-          <path d="M 0 0 L 10 5 L 0 10 z" class="arrow-head"></path>
-        </marker>
-        <marker
-          id="arrow-muted"
-          viewBox="0 0 10 10"
-          refX="9"
-          refY="5"
-          markerWidth="7"
-          markerHeight="7"
-          orient="auto-start-reverse"
-        >
-          <path d="M 0 0 L 10 5 L 0 10 z" class="arrow-head-muted"></path>
-        </marker>
-      </defs>
-
-      <!-- Context stages: not individually attributed (muted) -->
-      <g class="node context">
-        <rect x="8" y="60" width="140" height="58" rx="10"></rect>
-        <text x="78" y="84" text-anchor="middle">
-          Cameras
-        </text>
-        <text x="78" y="102" text-anchor="middle" class="sub">
-          on shelves
-        </text>
-      </g>
-      <g class="node context">
-        <rect x="168" y="60" width="150" height="58" rx="10"></rect>
-        <text x="243" y="84" text-anchor="middle">
-          Edge capture
-        </text>
-        <text x="243" y="102" text-anchor="middle" class="sub">
-          Raspberry Pi 4
-        </text>
-      </g>
-
-      <!-- Implemented stages (solid) -->
-      <g class="node implemented">
-        <rect x="338" y="60" width="150" height="58" rx="10"></rect>
-        <text x="413" y="84" text-anchor="middle">
-          YOLOv8 segmentation
-        </text>
-        <text x="413" y="102" text-anchor="middle" class="sub">
-          + counting logic
-        </text>
-      </g>
-      <g class="node implemented">
-        <rect x="508" y="60" width="140" height="58" rx="10"></rect>
-        <text x="578" y="84" text-anchor="middle">
-          FastAPI
-        </text>
-        <text x="578" y="102" text-anchor="middle" class="sub">
-          inference service
-        </text>
-      </g>
-      <g class="node implemented">
-        <rect x="668" y="60" width="120" height="58" rx="10"></rect>
-        <text x="728" y="84" text-anchor="middle">
-          Redis
-        </text>
-        <text x="728" y="102" text-anchor="middle" class="sub">
-          task queue
-        </text>
-      </g>
-      <g class="node implemented">
-        <rect x="808" y="60" width="144" height="58" rx="10"></rect>
-        <text x="880" y="84" text-anchor="middle">
-          Inventory results
-        </text>
-        <text x="880" y="102" text-anchor="middle" class="sub">
-          + monitoring
-        </text>
-      </g>
-
-      <!-- Contributed / integration points (dashed) -->
-      <g class="node integration">
-        <rect x="178" y="180" width="130" height="46" rx="10"></rect>
-        <text x="243" y="208" text-anchor="middle">
-          MQTT (existing)
-        </text>
-      </g>
-      <g class="node integration">
-        <rect x="523" y="180" width="110" height="46" rx="10"></rect>
-        <text x="578" y="208" text-anchor="middle">
-          AWS (infra)
-        </text>
-      </g>
-
-      <!-- Flow arrows -->
-      <g class="flow">
-        <line x1="148" y1="89" x2="166" y2="89" marker-end="url(#arrow-muted)"></line>
-        <line x1="318" y1="89" x2="336" y2="89" marker-end="url(#arrow)"></line>
-        <line x1="488" y1="89" x2="506" y2="89" marker-end="url(#arrow)"></line>
-        <line x1="648" y1="89" x2="666" y2="89" marker-end="url(#arrow)"></line>
-        <line x1="788" y1="89" x2="806" y2="89" marker-end="url(#arrow)"></line>
-        <line
-          x1="243"
-          y1="118"
-          x2="243"
-          y2="178"
-          class="dashed"
-          marker-end="url(#arrow-muted)"
-        ></line>
-        <line x1="578" y1="118" x2="578" y2="178" class="dashed" marker-end="url(#arrow)"></line>
-      </g>
-
-      <!-- Localized ownership legend -->
-      <g class="legend">
-        <rect x="8" y="256" width="14" height="14" rx="4" class="swatch implemented"></rect>
-        <text x="28" y="267">
-          {legend.implemented}
-        </text>
-        <rect x="170" y="256" width="14" height="14" rx="4" class="swatch integration"></rect>
-        <text x="190" y="267">
-          {legend.integration}
-        </text>
-        <rect x="392" y="256" width="14" height="14" rx="4" class="swatch context"></rect>
-        <text x="412" y="267">
-          {legend.context}
-        </text>
-      </g>
-    </svg>
+<div class:list={['architecture', { 'architecture--compact': compact }]} data-diagram aria-labelledby="sims-map-title" aria-describedby="sims-map-desc">
+  <div class="architecture__head">
+    <div>
+      <p class="architecture__label mono">{isId ? 'Alur sistem yang digeneralkan' : 'Generalized system flow'}</p>
+      <h3 id="sims-map-title">{title}</h3>
+    </div>
+    <ul class="legend" aria-label={isId ? 'Legenda kontribusi' : 'Contribution legend'}>
+      <li class="implemented">{legend.implemented}</li>
+      <li class="integration">{legend.integration}</li>
+      <li class="context">{legend.context}</li>
+    </ul>
   </div>
-  <figcaption class="scroll-hint mono">{scrollHint} →</figcaption>
-</figure>
+
+  <p id="sims-map-desc" class="visually-hidden">{desc}</p>
+
+  <div class="phase-grid">
+    {phases.map((phase) => (
+      <section class="phase">
+        <h4 class="mono">{phase.title}</h4>
+        <ol>
+          {phase.nodes.map(([kind, name, detail]) => (
+            <li class={`node node--${kind}`}>
+              <span class="node__name">{name}</span>
+              <span class="node__detail">{detail}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))}
+  </div>
+</div>
 
 <style>
-  .diagram-figure {
-    margin: var(--space-5) 0 0;
-  }
-
-  .diagram-scroll {
-    overflow-x: auto;
-    border: 1px solid var(--border-subtle);
+  .architecture {
+    width: 100%;
+    min-width: 0;
+    padding: clamp(1.25rem, 2.4vw, 2rem);
+    border: 1px solid var(--rule);
     border-radius: var(--radius-md);
-    background: var(--surface-1);
-    padding: var(--space-3);
+    background: var(--surface);
   }
 
-  .diagram {
-    display: block;
-    min-width: 700px;
-    height: auto;
+  .architecture__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-6);
+    align-items: end;
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--rule);
   }
 
-  .scroll-hint {
-    display: none;
-    margin-top: var(--space-2);
-    font-size: var(--text-xs);
-    color: var(--text-muted);
+  .architecture__label { margin-bottom: var(--space-2); color: var(--blue); font-size: var(--text-xs); }
+  .architecture h3 { max-width: 20ch; font-size: clamp(1.5rem, 2.4vw, 2.25rem); }
+
+  .legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
   }
 
-  @media (max-width: 760px) {
-    .scroll-hint {
-      display: block;
+  .legend li { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .legend li::before { width: 0.625rem; height: 0.625rem; border: 1px solid currentColor; content: ''; }
+  .legend .implemented { color: var(--blue); }
+  .legend .implemented::before { background: var(--blue); }
+  .legend .integration { color: var(--ink); }
+  .legend .integration::before { border-color: var(--amber); border-style: dashed; }
+  .legend .context { color: var(--ink-soft); }
+  .legend .context::before { background: var(--surface-strong); }
+
+  .phase-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
+    padding-top: var(--space-6);
+  }
+
+  .phase { min-width: 0; position: relative; }
+  .phase:not(:last-child)::after {
+    position: absolute;
+    top: 50%;
+    right: calc(-1 * var(--space-5));
+    width: var(--space-5);
+    height: 1px;
+    background: var(--ink-soft);
+    content: '';
+  }
+
+  .phase h4 {
+    margin: 0 0 var(--space-3);
+    color: var(--ink-soft);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .phase ol { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+  .node {
+    min-height: 5.75rem;
+    position: relative;
+    padding: var(--space-4);
+    border: 1px solid var(--rule);
+    background: var(--canvas);
+  }
+
+  .node:not(:last-child)::after {
+    position: absolute;
+    bottom: calc(-1 * var(--space-3));
+    left: 50%;
+    width: 1px;
+    height: var(--space-3);
+    background: var(--ink-soft);
+    content: '';
+  }
+
+  .node--implemented { border-left: 3px solid var(--blue); }
+  .node--integration { border-left: 3px dashed var(--amber); }
+  .node--context { border-left: 3px solid var(--rule); background: color-mix(in srgb, var(--canvas) 72%, var(--surface-strong)); }
+  .node__name { display: block; color: var(--ink); font-family: var(--font-mono); font-size: 0.875rem; font-weight: 500; line-height: 1.35; }
+  .node__detail { display: block; margin-top: var(--space-2); color: var(--ink-soft); font-size: 0.875rem; line-height: 1.45; }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .architecture--compact .node { min-height: 4.75rem; }
+  .architecture--compact .node__detail { display: none; }
+
+  @media (max-width: 1023px) {
+    .architecture__head { grid-template-columns: 1fr; align-items: start; }
+    .legend { justify-content: flex-start; }
+    .phase-grid { grid-template-columns: 1fr; }
+    .phase:not(:last-child)::after {
+      top: auto;
+      right: auto;
+      bottom: calc(-1 * var(--space-5));
+      left: 50%;
+      width: 1px;
+      height: var(--space-5);
     }
   }
 
-  /* Node treatments */
-  .node rect {
-    fill: var(--surface-2);
-  }
-
-  .node.implemented rect {
-    stroke: var(--neon-magenta);
-    stroke-width: 1.5;
-  }
-
-  .node.implemented text {
-    fill: var(--text-high);
-  }
-
-  .node.integration rect {
-    stroke: var(--neon-violet);
-    stroke-width: 1.2;
-    stroke-dasharray: 5 4;
-  }
-
-  .node.integration text {
-    fill: var(--text-body);
-  }
-
-  .node.context rect {
-    stroke: var(--border-subtle);
-    stroke-width: 1;
-  }
-
-  .node.context text {
-    fill: var(--text-muted);
-  }
-
-  .node text {
-    font-family: var(--font-mono);
-    font-size: 13px;
-  }
-
-  .node .sub {
-    font-size: 11px;
-    opacity: 0.75;
-  }
-
-  /* Flow lines */
-  .flow line {
-    stroke: var(--text-muted);
-    stroke-width: 1.5;
-  }
-
-  .flow line.dashed {
-    stroke-dasharray: 5 4;
-  }
-
-  .arrow-head {
-    fill: var(--neon-magenta);
-  }
-
-  .arrow-head-muted {
-    fill: var(--text-muted);
-  }
-
-  /* Legend */
-  .legend .swatch.implemented {
-    fill: var(--neon-magenta);
-  }
-
-  .legend .swatch.integration {
-    fill: none;
-    stroke: var(--neon-violet);
-    stroke-width: 1.4;
-    stroke-dasharray: 4 3;
-  }
-
-  .legend .swatch.context {
-    fill: var(--surface-2);
-    stroke: var(--border-subtle);
-  }
-
-  .legend text {
-    fill: var(--text-body);
-    font-family: var(--font-body);
-    font-size: 13px;
+  @media (max-width: 639px) {
+    .architecture { padding: var(--space-4); }
+    .architecture__head { padding-bottom: var(--space-5); }
+    .legend { display: grid; gap: var(--space-2); }
+    .phase-grid { gap: var(--space-6); padding-top: var(--space-5); }
+    .phase:not(:last-child)::after { bottom: calc(-1 * var(--space-6)); height: var(--space-6); }
+    .node { min-height: 0; }
+    .node__name,
+    .node__detail { font-size: 0.875rem; }
   }
 </style>

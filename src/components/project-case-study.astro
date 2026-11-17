@@ -1,0 +1,337 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { t, type Lang } from '../i18n/ui';
+import { localizedPath } from '../i18n/utils';
+import { diagramFor } from '../lib/diagrams';
+import { withBase } from '../lib/urls';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  lang: Lang;
+  entry: CollectionEntry<'projects'>;
+  Content: any;
+  headings: Heading[];
+}
+
+const { lang, entry, Content, headings } = Astro.props;
+const d = entry.data;
+const Diagram = diagramFor(d.diagram);
+const onPage = headings.filter((heading) => heading.depth === 2);
+const isId = lang === 'id';
+const isFlagship = d.diagram === 'sims';
+const backHref = withBase(localizedPath('/projects/', lang));
+const statusText = t(lang, `status.${d.statusKind}` as const);
+
+const brief = isId
+  ? [
+      ['Konteks', d.company ?? 'Lingkungan inventaris rumah sakit'],
+      ['Peran', d.role ?? 'Computer Vision Engineer'],
+      ['Status', d.status ?? statusText],
+      ['Batas bukti', d.evidence?.caveat ?? d.disclosure],
+    ]
+  : [
+      ['Context', d.company ?? 'Hospital inventory environment'],
+      ['Role', d.role ?? 'Computer Vision Engineer'],
+      ['Status', d.status ?? statusText],
+      ['Evidence boundary', d.evidence?.caveat ?? d.disclosure],
+    ];
+---
+
+{isFlagship ? (
+  <article class="flagship-case">
+    <header class="case-hero">
+      <div class="wrap grid-12">
+        <div class="case-title">
+          <p class="eyebrow">{isId ? 'Studi kasus · Sistem inventaris computer vision' : 'Case study · Computer vision inventory system'}</p>
+          <h1>{d.title}</h1>
+          <p class="overview">{d.overview}</p>
+        </div>
+        <div class="case-meta">
+          <p class="status-label">{statusText}</p>
+          <dl>
+            <div><dt>{isId ? 'Organisasi' : 'Organization'}</dt><dd>{d.company}</dd></div>
+            <div><dt>{isId ? 'Peran' : 'Role'}</dt><dd>{d.role}</dd></div>
+            <div><dt>{isId ? 'Periode' : 'Period'}</dt><dd>{d.period}</dd></div>
+          </dl>
+        </div>
+      </div>
+    </header>
+
+    <section class="engineering-brief" aria-labelledby="engineering-brief-title">
+      <div class="wrap">
+        <div class="brief-head grid-12">
+          <div>
+            <p class="eyebrow">{isId ? 'Ringkasan rekayasa' : 'Engineering brief'}</p>
+            <h2 id="engineering-brief-title">{isId ? 'Dari citra rak ke hitungan operasional' : 'From shelf images to operational counts'}</h2>
+          </div>
+          <p>{isId
+            ? 'SIMS menghubungkan capture di perangkat edge, inferensi terpusat, segmentasi, dan logika geometri untuk menghitung kotak yang tidak seluruhnya terlihat.'
+            : 'SIMS connects edge capture, centralized inference, segmentation, and geometry-based logic to count boxes that are not fully visible.'}</p>
+        </div>
+
+        <dl class="brief-grid">
+          {brief.map(([label, value]) => (
+            <div><dt class="mono">{label}</dt><dd>{value}</dd></div>
+          ))}
+        </dl>
+
+        {d.evidence && (
+          <div class="evaluation">
+            <p class="evaluation__value">{d.evidence.value}</p>
+            <div>
+              <h3>{d.evidence.label}</h3>
+              <p>{d.evidence.definition}</p>
+              <p class="evaluation__scope mono">{d.evidence.scope}</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+
+    {d.contribution && d.contribution.length > 0 && (
+      <section class="contribution-section" aria-labelledby="contribution-heading">
+        <div class="wrap">
+          <div class="section-intro grid-12">
+            <div>
+              <p class="eyebrow">{isId ? 'Batas kontribusi' : 'Contribution boundary'}</p>
+              <h2 id="contribution-heading">{t(lang, 'projects.contribution')}</h2>
+            </div>
+            <p>{isId
+              ? 'Tahap yang diimplementasikan, dikerjakan bersama, dan tidak teratribusi dipisahkan agar ruang lingkup kontribusi tetap jelas.'
+              : 'Implemented, collaborative, and unattributed stages are separated so the contribution scope stays explicit.'}</p>
+          </div>
+          <div class="contribution-grid">
+            {d.contribution.map((group) => (
+              <section class={`contribution-group contribution-group--${group.group}`}>
+                <h3 class="mono">{t(lang, `contribution.${group.group}` as const)}</h3>
+                <ul>
+                  {group.items.map((item) => <li>{item}</li>)}
+                </ul>
+              </section>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {Diagram && (
+      <section class="architecture-section" aria-labelledby="architecture-heading">
+        <div class="wrap">
+          <div class="architecture-copy grid-12">
+            <div>
+              <p class="eyebrow">{isId ? 'Arsitektur responsif' : 'Responsive architecture'}</p>
+              <h2 id="architecture-heading">{isId ? 'Alur sistem SIMS' : 'SIMS system flow'}</h2>
+            </div>
+            <p>{isId
+              ? 'Diagram menyusun ulang alur yang sama secara vertikal pada layar sempit. Warna dan garis selalu disertai label kontribusi.'
+              : 'The diagram reflows the same system vertically on narrow screens. Color and line style are always paired with contribution labels.'}</p>
+          </div>
+          <Diagram
+            lang={lang}
+            title={isId ? 'Dari kamera rak ke sistem inventaris' : 'From shelf cameras to the inventory system'}
+            desc={t(lang, 'diagram.sims.desc')}
+            legend={{
+              implemented: t(lang, 'diagram.legend.implemented'),
+              integration: t(lang, 'diagram.legend.integration'),
+              context: t(lang, 'diagram.legend.context'),
+            }}
+          />
+        </div>
+      </section>
+    )}
+
+    <section class="case-narrative">
+      <div class="wrap narrative-grid">
+        {onPage.length > 0 && (
+          <nav class="on-page" aria-label={t(lang, 'projects.onPage')}>
+            <p class="mono">{t(lang, 'projects.onPage')}</p>
+            <ul>
+              {onPage.map((heading) => (
+                <li><a href={`#${heading.slug}`}>{heading.text}</a></li>
+              ))}
+            </ul>
+          </nav>
+        )}
+        <div class="prose"><Content /></div>
+        <footer class="disclosure-note">
+          <p class="mono">{t(lang, 'projects.redacted')}</p>
+          <p>{d.disclosure}</p>
+          <a href={backHref}>{t(lang, 'projects.backTo')}</a>
+        </footer>
+      </div>
+    </section>
+  </article>
+) : (
+  <article class="legacy-case wrap">
+    <header>
+      <p class="labels mono"><span>{t(lang, 'projects.professional')}</span><span>{t(lang, 'projects.redacted')}</span></p>
+      <h1>{d.title}</h1>
+      <p class="legacy-meta mono">{d.category} · {d.company} · {d.role} · {d.period} · {statusText}</p>
+      <p class="legacy-overview">{d.overview}</p>
+    </header>
+    {d.contribution && (
+      <section class="legacy-contribution">
+        <h2>{t(lang, 'projects.contribution')}</h2>
+        {d.contribution.map((group) => (
+          <div><h3 class="mono">{t(lang, `contribution.${group.group}` as const)}</h3><ul>{group.items.map((item) => <li>{item}</li>)}</ul></div>
+        ))}
+      </section>
+    )}
+    {Diagram && (
+      <Diagram
+        lang={lang}
+        title={d.diagram ? t(lang, `diagram.${d.diagram}.title` as never) : ''}
+        desc={d.diagram ? t(lang, `diagram.${d.diagram}.desc` as never) : ''}
+        legend={{ implemented: t(lang, 'diagram.legend.implemented'), integration: t(lang, 'diagram.legend.integration'), context: t(lang, 'diagram.legend.context') }}
+        scrollHint={t(lang, 'diagram.scrollHint')}
+      />
+    )}
+    <div class="legacy-body">
+      {onPage.length > 0 && <nav class="legacy-on-page"><p class="mono">{t(lang, 'projects.onPage')}</p><ul>{onPage.map((heading) => <li><a href={`#${heading.slug}`}>{heading.text}</a></li>)}</ul></nav>}
+      <div class="prose"><Content /></div>
+      <footer class="disclosure-note"><p class="mono">{t(lang, 'projects.redacted')}</p><p>{d.disclosure}</p><a href={backHref}>{t(lang, 'projects.backTo')}</a></footer>
+    </div>
+  </article>
+)}
+
+<style>
+  .case-hero { padding-block: clamp(4.5rem, 8vw, 8rem); border-bottom: 1px solid var(--rule); }
+  .case-title { grid-column: 1 / span 8; }
+  .case-title h1 { max-width: 18ch; margin-top: var(--space-5); font-size: clamp(3.4rem, 6vw, 6rem); }
+  .overview { max-width: 58ch; margin-top: var(--space-6); font-size: var(--text-lg); line-height: 1.55; }
+  .case-meta { grid-column: 10 / -1; align-self: end; }
+  .case-meta dl { margin: var(--space-5) 0 0; }
+  .case-meta dl div { padding-block: var(--space-3); border-top: 1px solid var(--rule); }
+  .case-meta dt { color: var(--ink-soft); font-family: var(--font-mono); font-size: var(--text-xs); }
+  .case-meta dd { margin: var(--space-1) 0 0; color: var(--ink); font-size: var(--text-sm); }
+
+  .engineering-brief,
+  .contribution-section,
+  .architecture-section { padding-block: var(--section-pad); }
+  .engineering-brief { background: var(--surface); }
+  .brief-head > div,
+  .section-intro > div,
+  .architecture-copy > div { grid-column: 1 / span 6; }
+  .brief-head > p,
+  .section-intro > p,
+  .architecture-copy > p { grid-column: 8 / -1; max-width: 44rem; font-size: var(--text-lg); line-height: 1.55; }
+  .brief-head h2,
+  .section-intro h2,
+  .architecture-copy h2 { max-width: 16ch; margin-top: var(--space-4); font-size: var(--text-3xl); }
+
+  .brief-grid { margin: var(--space-8) 0 0; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--rule); border-left: 1px solid var(--rule); }
+  .brief-grid div { min-width: 0; padding: var(--space-5); border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .brief-grid dt { color: var(--blue); font-size: var(--text-xs); }
+  .brief-grid dd { margin: var(--space-3) 0 0; color: var(--ink); font-size: 1rem; line-height: 1.5; }
+
+  .evaluation { margin-top: var(--space-7); display: grid; grid-template-columns: minmax(12rem, 3fr) minmax(0, 9fr); gap: var(--grid-gap); align-items: start; padding-top: var(--space-6); border-top: 1px solid var(--ink); }
+  .evaluation__value { color: var(--green); font-size: clamp(4rem, 9vw, 8rem); font-weight: 500; line-height: 0.8; letter-spacing: -0.06em; }
+  .evaluation h3 { max-width: 24ch; }
+  .evaluation h3 + p { max-width: 52ch; margin-top: var(--space-3); }
+  .evaluation__scope { margin-top: var(--space-4); color: var(--ink-soft); font-size: var(--text-sm); }
+
+  .contribution-section { background: var(--canvas); }
+  .contribution-grid { margin-top: var(--space-8); display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--grid-gap); }
+  .contribution-group { padding-top: var(--space-4); border-top: 3px solid var(--rule); }
+  .contribution-group--implemented { grid-column: 1 / span 6; border-color: var(--blue); }
+  .contribution-group--contributed { grid-column: 7 / span 3; border-top-style: dashed; border-color: var(--amber); }
+  .contribution-group--unattributed { grid-column: 10 / span 3; }
+  .contribution-group h3 { color: var(--ink); font-size: 0.875rem; letter-spacing: 0; }
+  .contribution-group ul { margin: var(--space-4) 0 0; padding-left: 1.2rem; display: grid; gap: var(--space-3); }
+  .contribution-group li { font-size: 1rem; line-height: 1.5; }
+
+  .architecture-section { background: var(--ink); }
+  .architecture-copy { margin-bottom: var(--space-8); }
+  .architecture-copy h2 { color: var(--canvas); }
+  .architecture-copy > p { color: #c8ced3; }
+
+  .case-narrative { padding-block: var(--section-pad); }
+  .narrative-grid { display: grid; grid-template-columns: 13rem minmax(0, 47rem) 1fr; gap: var(--grid-gap); align-items: start; }
+  .on-page { grid-column: 1; padding-top: var(--space-3); border-top: 1px solid var(--rule); }
+  .on-page > p { color: var(--blue); font-size: var(--text-xs); }
+  .on-page ul { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; }
+  .on-page a { min-height: 44px; display: flex; align-items: center; color: var(--ink-soft); font-size: var(--text-sm); text-decoration: none; border-bottom: 1px solid var(--rule); }
+  .on-page a:hover { color: var(--blue); }
+  .prose { grid-column: 2; min-width: 0; }
+  .prose :global(h2) { margin-top: var(--space-9); margin-bottom: var(--space-5); font-size: var(--text-2xl); }
+  .prose :global(h2:first-child) { margin-top: 0; }
+  .prose :global(p) { max-width: 68ch; margin-top: var(--space-4); line-height: 1.7; }
+  .prose :global(ul),
+  .prose :global(ol) { max-width: 68ch; margin-top: var(--space-5); padding-left: var(--space-5); display: grid; gap: var(--space-3); }
+  .prose :global(li) { line-height: 1.65; }
+  .prose :global(strong) { color: var(--ink); font-weight: 500; }
+  .disclosure-note { grid-column: 2; margin-top: var(--space-9); padding-top: var(--space-5); border-top: 1px solid var(--rule); display: grid; gap: var(--space-3); }
+  .disclosure-note > .mono { color: var(--rust); font-size: var(--text-xs); }
+  .disclosure-note p { max-width: 68ch; }
+  .disclosure-note a { min-height: 44px; display: inline-flex; align-items: center; justify-self: start; }
+
+  .legacy-case { padding-block: var(--space-8) var(--space-9); }
+  .legacy-case > header { padding-bottom: var(--space-6); border-bottom: 1px solid var(--rule); }
+  .legacy-case .labels { display: flex; gap: var(--space-3); color: var(--amber); font-size: var(--text-xs); }
+  .legacy-case h1 { max-width: 24ch; margin-top: var(--space-4); }
+  .legacy-meta { margin-top: var(--space-4); color: var(--ink-soft); font-size: var(--text-xs); }
+  .legacy-overview { max-width: 62ch; margin-top: var(--space-4); font-size: var(--text-lg); }
+  .legacy-contribution { margin-block: var(--space-7); padding: var(--space-6); background: var(--surface); }
+  .legacy-contribution h2 { margin-bottom: var(--space-5); }
+  .legacy-contribution > div + div { margin-top: var(--space-5); }
+  .legacy-contribution h3 { font-size: var(--text-xs); }
+  .legacy-contribution li { font-size: 1rem; }
+  .legacy-body { margin-top: var(--space-7); display: grid; grid-template-columns: 13rem minmax(0, 47rem) 1fr; gap: var(--grid-gap); align-items: start; }
+  .legacy-on-page { grid-column: 1; }
+  .legacy-on-page ul { list-style: none; padding: 0; }
+  .legacy-on-page a { min-height: 44px; display: flex; align-items: center; font-size: var(--text-sm); }
+
+  @media (max-width: 1023px) {
+    .case-title { grid-column: 1 / span 8; }
+    .case-meta { grid-column: 9 / -1; }
+    .brief-grid { grid-template-columns: repeat(2, 1fr); }
+    .contribution-group--implemented { grid-column: 1 / span 12; }
+    .contribution-group--contributed { grid-column: 1 / span 6; }
+    .contribution-group--unattributed { grid-column: 7 / span 6; }
+    .narrative-grid,
+    .legacy-body { grid-template-columns: minmax(0, 1fr); }
+    .on-page,
+    .prose,
+    .disclosure-note,
+    .legacy-on-page { grid-column: 1; }
+    .on-page ul,
+    .legacy-on-page ul { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 var(--space-5); }
+  }
+
+  @media (max-width: 767px) {
+    .case-hero .grid-12,
+    .brief-head,
+    .section-intro,
+    .architecture-copy { display: grid; grid-template-columns: 1fr; }
+    .case-title,
+    .case-meta,
+    .brief-head > div,
+    .brief-head > p,
+    .section-intro > div,
+    .section-intro > p,
+    .architecture-copy > div,
+    .architecture-copy > p { grid-column: 1; }
+    .case-meta { margin-top: var(--space-7); }
+    .brief-head > p,
+    .section-intro > p,
+    .architecture-copy > p { margin-top: var(--space-5); }
+    .evaluation { grid-template-columns: 1fr; }
+    .contribution-grid { grid-template-columns: 1fr; }
+    .contribution-group--implemented,
+    .contribution-group--contributed,
+    .contribution-group--unattributed { grid-column: 1; }
+  }
+
+  @media (max-width: 639px) {
+    .case-title h1 { font-size: clamp(2.75rem, 13vw, 3.5rem); }
+    .brief-grid { grid-template-columns: 1fr; }
+    .on-page ul,
+    .legacy-on-page ul { grid-template-columns: 1fr; }
+    .legacy-contribution { padding: var(--space-5); }
+  }
+</style>
