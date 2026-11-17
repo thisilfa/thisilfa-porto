@@ -101,11 +101,11 @@ const hrefFor = (path: string) => withBase(localizedPath(path, lang));
     min-height: 18rem;
   }
   .footer--home {
-    min-height: 24rem;
+    min-height: 0;
   }
   .footer--home .inner {
-    padding-block: var(--space-7) var(--space-5);
-    gap: var(--space-6);
+    padding-block: var(--space-6) var(--space-4);
+    gap: var(--space-5);
   }
   .footer--compact .inner {
     align-content: space-between;
@@ -208,13 +208,13 @@ const hrefFor = (path: string) => withBase(localizedPath(path, lang));
   }
 
   .home-contact h2 {
-    max-width: 20ch;
+    max-width: 24ch;
     color: var(--canvas);
-    font-size: clamp(2rem, 3.6vw, 3.75rem);
+    font-size: clamp(1.5rem, 1.2vw + 1rem, 2.25rem);
   }
 
   .footer--home .footer-mark {
-    font-size: clamp(2rem, 4.5vw, 4rem);
+    font-size: clamp(1.75rem, 3.5vw, 3rem);
   }
   .footer--home .closing__links {
     grid-template-columns: minmax(0, 6fr) minmax(18rem, 6fr);
