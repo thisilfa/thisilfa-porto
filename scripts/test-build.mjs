@@ -40,10 +40,14 @@ for (const marker of ['hreflang="en-US"', 'hreflang="id-ID"', 'hreflang="x-defau
   }
 }
 
-// AE2: every locale's home page renders exactly five nav entries, and no
-// nav entry ever points at Personal Lab or Engineering Journal.
-const homePages = ['index.html', 'id/index.html'];
-for (const page of homePages) {
+// The centred desktop shell exposes five destinations across the brand,
+// three-item nav, and contact CTA. Deferred sections never enter the nav.
+const homePages = [
+  { file: 'index.html', home: '/thisilfa-porto/', contact: '/thisilfa-porto/contact/' },
+  { file: 'id/index.html', home: '/thisilfa-porto/id/', contact: '/thisilfa-porto/id/contact/' },
+];
+for (const pageConfig of homePages) {
+  const page = pageConfig.file;
   const url = new URL(page, dist);
   if (!(await exists(url))) continue; // locale pages appear from U6 onward
   const html = await readFile(url, 'utf8');
@@ -53,12 +57,20 @@ for (const page of homePages) {
     process.exit(1);
   }
   const entries = (desktopNav[1].match(/<a /g) ?? []).length;
-  if (entries !== 5) {
-    console.error(`test:build — ${page}: expected 5 nav entries, found ${entries}`);
+  if (entries !== 3) {
+    console.error(`test:build — ${page}: expected 3 centred nav entries, found ${entries}`);
     process.exit(1);
   }
   if (/lab|journal/i.test(desktopNav[1])) {
     console.error(`test:build — ${page}: deferred section leaked into the nav`);
+    process.exit(1);
+  }
+  if (!html.includes(`class="mark" href="${pageConfig.home}"`)) {
+    console.error(`test:build — ${page}: brand does not link to locale home`);
+    process.exit(1);
+  }
+  if (!html.includes(`class="nav-cta btn btn-primary" href="${pageConfig.contact}"`)) {
+    console.error(`test:build — ${page}: contact CTA is missing or mislocalized`);
     process.exit(1);
   }
 
@@ -112,7 +124,7 @@ for (const marker of [
 // AE3, site-wide: education content lives only in the downloadable PDF.
 // Scan every built HTML file for education terms.
 const educationTerms =
-  /universit|bachelor|master of|b\.?sc|m\.?sc|gelar|sarjana|\bIPK\b|\bGPA\b|coursework|transcript|thesis|skripsi/i;
+  /universit|bachelor|master of|b\.?sc|m\.?sc|\bgelar\b|sarjana|\bIPK\b|\bGPA\b|coursework|transcript|thesis|skripsi/i;
 async function* htmlFiles(dir) {
   for (const name of await readdir(dir, { withFileTypes: true })) {
     const child = new URL(name.name + (name.isDirectory() ? '/' : ''), dir);
@@ -122,7 +134,11 @@ async function* htmlFiles(dir) {
 }
 for await (const file of htmlFiles(dist)) {
   const html = await readFile(file, 'utf8');
-  if (educationTerms.test(html)) {
+  const visibleText = html
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ');
+  if (educationTerms.test(visibleText)) {
     console.error(`test:build — education term found in ${file.pathname.split('/dist/')[1]} (AE3)`);
     process.exit(1);
   }
@@ -133,25 +149,21 @@ const homes = [
   {
     file: 'index.html',
     markers: [
-      'Building intelligent systems through practical engineering',
-      'Featured Projects',
-      'Technical Expertise',
-      'Professional Journey',
+      'AI engineering for real-world systems.',
+      'Selected work',
+      'Engineering method',
       'href="/thisilfa-porto/projects/"',
       'href="/thisilfa-porto/contact/"',
-      'href="/thisilfa-porto/downloads/silfaradila-mei-resume-en.pdf"',
     ],
   },
   {
     file: 'id/index.html',
     markers: [
-      'Membangun sistem cerdas melalui rekayasa yang praktis',
-      'Proyek Unggulan',
-      'Keahlian Teknis',
-      'Perjalanan Profesional',
+      'Rekayasa AI untuk sistem operasional.',
+      'Proyek pilihan',
+      'Cara kerja',
       'href="/thisilfa-porto/id/projects/"',
       'href="/thisilfa-porto/id/contact/"',
-      'href="/thisilfa-porto/downloads/silfaradila-mei-resume-en.pdf"',
     ],
   },
 ];
@@ -167,6 +179,15 @@ for (const home of homes) {
       console.error(`test:build — ${home.file} is missing: ${marker}`);
       process.exit(1);
     }
+  }
+}
+
+// The downloadable CV lives on each locale's Resume page.
+for (const resumeFile of ['resume/index.html', 'id/resume/index.html']) {
+  const html = await readFile(new URL(resumeFile, dist), 'utf8');
+  if (!html.includes('href="/thisilfa-porto/downloads/silfaradila-mei-resume-en.pdf"')) {
+    console.error(`test:build — ${resumeFile} is missing the CV download`);
+    process.exit(1);
   }
 }
 
@@ -348,14 +369,19 @@ for (const [resumeFile, extra] of [
 // U5 (depth plan): the SIMS gold standard — contribution groups, the diagram,
 // and the owner-decided metric sentence in exactly one of its two legal
 // states (defined claim or qualitative, never a bare figure).
-const METRIC_SENTENCES = [
-  'Peak average daily item-counting correctness of 98.6% in October',
-  'Akurasi penghitungan harian rata-rata puncak sebesar 98,6% pada Oktober',
-];
 const metricState = (html) => {
-  const hasSentence = METRIC_SENTENCES.some((s) => html.includes(s));
   const hasFigure = /98[.,]6\s*%/.test(html);
-  if (hasSentence) return 'defined';
+  const hasLabel =
+    /Peak average daily item-counting correctness|Akurasi penghitungan item harian rata-rata puncak/.test(
+      html,
+    );
+  const hasDefinition =
+    /Detected inventory counts compared with actual inventory quantities|Jumlah inventaris hasil deteksi dibandingkan dengan kuantitas inventaris aktual/.test(
+      html,
+    );
+  const hasScope =
+    /Deployed shelves, reported in October|Rak yang terdeploy, dilaporkan pada Oktober/.test(html);
+  if (hasFigure && hasLabel && hasDefinition && hasScope) return 'defined';
   if (!hasFigure) return 'qualitative';
   return 'ILLEGAL'; // figure without its definition — R4 violation
 };
@@ -369,7 +395,10 @@ for (const prefix of ['projects/sims/', 'id/projects/sims/']) {
 
   // Contribution section: audit groups present, unattributed as the muted
   // single line, and no unattributed component claimed as implemented.
-  const contribution = html.match(/<section class="contribution"[\s\S]*?<\/section>/)?.[0] ?? '';
+  const contribution =
+    html.match(
+      /<section class="contribution-section"[\s\S]*?<section class="architecture-section"/,
+    )?.[0] ?? '';
   if (!contribution) {
     console.error(`test:build — ${prefix}: contribution section missing`);
     process.exit(1);
@@ -377,7 +406,7 @@ for (const prefix of ['projects/sims/', 'id/projects/sims/']) {
   const groupLabels = prefix.startsWith('id/')
     ? // HTML escapes ampersands, so these match the unescaped fragments.
       ['Saya mengimplementasikan', 'Saya berkontribusi dalam', 'Tidak teratribusi individual']
-    : ['I implemented', 'I contributed to', 'Designed', 'Not individually attributed'];
+    : ['I implemented', 'I contributed to', 'Not individually attributed'];
   for (const label of groupLabels) {
     if (!contribution.includes(label)) {
       console.error(`test:build — ${prefix}: contribution group missing: ${label}`);
@@ -386,9 +415,12 @@ for (const prefix of ['projects/sims/', 'id/projects/sims/']) {
   }
   // Each rendered group block must not claim unattributed components; the
   // muted unattributed line is exempt (that is its purpose).
-  const groupBlocks = contribution.match(/<div class="group">[\s\S]*?<\/div>/g) ?? [];
+  const groupBlocks =
+    contribution.match(/<section class="contribution-group[^>]*>[\s\S]*?<\/section>/g) ?? [];
   if (
-    groupBlocks.some((block) => /camera setup|image acquisition|frontend|dashboard/i.test(block))
+    groupBlocks
+      .filter((block) => !block.includes('contribution-group--unattributed'))
+      .some((block) => /camera setup|image acquisition|frontend|dashboard/i.test(block))
   ) {
     console.error(
       `test:build — ${prefix}: unattributed component rendered as an implemented/contributed bullet`,
@@ -396,9 +428,9 @@ for (const prefix of ['projects/sims/', 'id/projects/sims/']) {
     process.exit(1);
   }
 
-  // The diagram: inline SVG with role=img and the localized legend.
-  if (!/<svg[^>]*role="img"/.test(html)) {
-    console.error(`test:build — ${prefix}: the architecture diagram (role="img" SVG) is missing`);
+  // The responsive semantic diagram and localized contribution legend.
+  if (!/<div class="architecture[^>]*"[^>]*data-diagram/.test(html)) {
+    console.error(`test:build — ${prefix}: the responsive architecture diagram is missing`);
     process.exit(1);
   }
   const legendStrings = prefix.startsWith('id/')
@@ -421,7 +453,7 @@ for (const prefix of ['projects/sims/', 'id/projects/sims/']) {
     }
     if (
       /model accuracy|model accuracy figure|akurasi model|shelf-level/i.test(html) &&
-      !/not a model accuracy/i.test(html)
+      !/not a model accuracy|bukan (?:angka )?akurasi model/i.test(html)
     ) {
       console.error(
         `test:build — ${prefix}: metric mislabeled as model or shelf-level accuracy (R4)`,
