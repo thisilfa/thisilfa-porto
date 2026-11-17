@@ -3,29 +3,40 @@
  * mobile disclosure below the breakpoint. The language switcher (U6)
  * slots in beside the nav. */
 import { navItems, navPaths, t, type Lang } from '../i18n/ui';
+import { localizedPath, neutralRoute, stripBase } from '../i18n/utils';
 import { withBase } from '../lib/urls';
 import LanguageSwitcher from './language-switcher.astro';
 import MobileNav from './mobile-nav.astro';
 
 interface Props {
   lang?: Lang;
+  variant?: 'default' | 'center';
 }
 
-const { lang = 'en' } = Astro.props;
+const { lang = 'en', variant = 'default' } = Astro.props;
+const currentRoute = neutralRoute(stripBase(Astro.url.pathname, import.meta.env.BASE_URL));
+const hrefFor = (path: string) => withBase(localizedPath(path, lang));
 ---
 
-<header class="site-header">
-  <div class="inner">
-    <a class="mark mono" href={withBase(navPaths.home)}>
-      {t(lang, 'site.name')}
+<header class:list={['site-header', 'nav', `site-header--${variant}`]}>
+  <div class="inner wrap">
+    <a class="skip-link" href="#main">{t(lang, 'a11y.skipToContent')}</a>
+    <a class="mark" href={hrefFor(navPaths.home)}>
+      Silfaradila Mei
     </a>
     <nav class="desktop-nav" aria-label={t(lang, 'nav.home')}>
-      {navItems.map((item) => (
-        <a href={withBase(navPaths[item])}>{t(lang, `nav.${item}` as const)}</a>
+      {navItems.filter((item) => item !== 'home' && item !== 'contact').map((item) => (
+        <a
+          href={hrefFor(navPaths[item])}
+          aria-current={currentRoute === navPaths[item] ? 'page' : undefined}
+        >{t(lang, `nav.${item}` as const)}</a>
       ))}
     </nav>
     <div class="end">
       <LanguageSwitcher lang={lang} />
+      <a class="nav-cta btn btn-primary" href={hrefFor(navPaths.contact)}>
+        {lang === 'id' ? 'Hubungi Silfaradila' : 'Contact Silfaradila'}
+      </a>
       <MobileNav lang={lang} />
     </div>
   </div>
@@ -33,52 +44,77 @@ const { lang = 'en' } = Astro.props;
 
 <style>
   .site-header {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 50;
-    background: color-mix(in oklab, var(--surface-0) 85%, transparent);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-subtle);
+    height: var(--nav-height);
+    background: var(--canvas);
+    border-bottom: 1px solid var(--rule);
   }
 
   .inner {
-    max-width: var(--container);
+    height: 100%;
     margin: 0 auto;
-    padding: var(--space-3) var(--container-pad);
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-4);
-  }
-
-  .mark {
-    color: var(--text-high);
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: var(--text-sm);
-    text-decoration: none;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
-  }
-
-  .mark:hover {
-    color: var(--neon-magenta);
-  }
-
-  .desktop-nav {
-    display: flex;
     gap: var(--space-5);
   }
 
-  .desktop-nav a {
-    color: var(--text-body);
+  .site-header--center .inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .site-header--center .desktop-nav { justify-self: center; }
+  .site-header--center .end { justify-self: end; }
+
+  .mark {
+    color: var(--p-ink);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 1.15rem;
     text-decoration: none;
-    font-size: var(--text-sm);
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+
+  .mark:hover { color: var(--p-accent); }
+
+  .desktop-nav {
+    display: flex;
+    gap: var(--space-7);
+  }
+
+  .desktop-nav a {
+    color: var(--p-ink);
+    text-decoration: none;
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 0.9375rem;
+    font-weight: 500;
     transition: color var(--transition-fast);
   }
 
-  .desktop-nav a:hover {
-    color: var(--neon-magenta);
+  .desktop-nav a:hover { color: var(--blue); }
+  .desktop-nav a[aria-current='page']::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: var(--blue);
+    content: '';
   }
 
   .end {
@@ -87,9 +123,45 @@ const { lang = 'en' } = Astro.props;
     gap: var(--space-3);
   }
 
-  @media (max-width: 768px) {
+  .nav-cta {
+    min-height: 3rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 1rem;
+    border: 1px solid var(--blue);
+    border-radius: var(--radius-sm);
+    color: var(--white);
+    background: var(--blue);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: transform var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+  }
+
+  .nav-cta:hover { transform: translateY(-2px); background: var(--blue-dark); color: var(--white); }
+
+  .skip-link {
+    position: absolute;
+    left: var(--container-pad);
+    top: -5rem;
+    z-index: 100;
+    padding: 0.7rem 1rem;
+    background: var(--ink);
+    color: var(--canvas);
+  }
+
+  .skip-link:focus { top: 0.5rem; }
+
+  @media (max-width: 1023px) {
+    .site-header--center .inner { display: flex; }
     .desktop-nav {
       display: none;
     }
+  }
+
+  @media (max-width: 639px) {
+    .nav-cta { display: none; }
+    .mark { font-size: 1rem; min-height: 44px; }
+    .end { gap: var(--space-2); }
   }
 </style>

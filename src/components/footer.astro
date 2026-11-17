@@ -1,104 +1,269 @@
 ---
-/** Site footer: name, tagline, the five nav entries, and the contact links.
- * The contact addresses are real values (origin R10); GitHub and LinkedIn
- * open externally, email opens the mail client. */
 import { navItems, navPaths, t, type Lang } from '../i18n/ui';
+import { localizedPath } from '../i18n/utils';
 import { withBase } from '../lib/urls';
 
 interface Props {
   lang?: Lang;
+  variant?: 'expressive' | 'medium' | 'compact' | 'home';
 }
 
-const { lang = 'en' } = Astro.props;
+const { lang = 'en', variant = 'medium' } = Astro.props;
 const year = new Date().getFullYear();
+const hrefFor = (path: string) => withBase(localizedPath(path, lang));
 ---
 
-<footer class="site-footer">
-  <div class="inner">
-    <div class="who">
-      <p class="mark mono">{t(lang, 'site.name')}</p>
-      <p class="tagline">{t(lang, 'site.tagline')}</p>
+<footer class:list={['site-footer', 'closing', `footer--${variant}`]}>
+  {variant === 'home' && (
+    <canvas class="footer-petals petal-canvas" data-petals="footer" aria-hidden="true"></canvas>
+  )}
+  <div class="inner wrap">
+    {variant !== 'compact' && variant !== 'home' && (
+      <div class="who closing__cta">
+        <div>
+          <p class="footer-label mono">{lang === 'id' ? 'Kontak' : 'Contact'}</p>
+          <h2>
+            {lang === 'id'
+              ? 'Mari bahas sistem yang perlu dibangun.'
+              : 'Let’s discuss the system you need to build.'}
+          </h2>
+        </div>
+        <a class="btn btn-primary" href={hrefFor(navPaths.contact)}>
+          {lang === 'id' ? 'Hubungi Silfaradila' : 'Contact Silfaradila'}
+        </a>
+      </div>
+    )}
+
+    {variant === 'home' && (
+      <div class="home-contact">
+        <div>
+          <p class="footer-label mono">{lang === 'id' ? 'Kontak' : 'Contact'}</p>
+          <h2>{lang === 'id' ? 'Punya sistem yang perlu dibangun?' : 'Have a system to build?'}</h2>
+        </div>
+        <a class="btn btn-primary" href={hrefFor(navPaths.contact)}>
+          {lang === 'id' ? 'Hubungi saya' : 'Contact me'}
+        </a>
+      </div>
+    )}
+
+    <div class="closing__links">
+      <a class="footer-mark" href={hrefFor(navPaths.home)}>
+        Silfaradila Mei
+      </a>
+      <div class="directory">
+        <nav class="links" aria-label={t(lang, 'nav.home')}>
+          {navItems
+            .filter((item) => item !== 'home')
+            .map((item) => (
+              <a href={hrefFor(navPaths[item])}>{t(lang, `nav.${item}` as const)}</a>
+            ))}
+        </nav>
+        <nav class="socials" aria-label="Social">
+          <a href="mailto:silfaradilamei@gmail.com">Email</a>
+          <a href="https://www.linkedin.com/in/silfaradila/" rel="me noopener">
+            LinkedIn
+          </a>
+          <a href="https://github.com/thisilfa" rel="me noopener">
+            GitHub
+          </a>
+        </nav>
+      </div>
+      <p class="note">© {year} Silfaradila Mei Fizahidah. Yogyakarta, Indonesia.</p>
     </div>
-    <nav class="links" aria-label={t(lang, 'nav.home')}>
-      {navItems.map((item) => (
-        <a href={withBase(navPaths[item])}>{t(lang, `nav.${item}` as const)}</a>
-      ))}
-    </nav>
-    <nav class="socials" aria-label="Social">
-      <a href="mailto:silfaradilamei@gmail.com">silfaradilamei@gmail.com</a>
-      <a href="https://www.linkedin.com/in/silfaradila/" rel="me noopener">
-        LinkedIn
-      </a>
-      <a href="https://github.com/thisilfa" rel="me noopener">
-        GitHub
-      </a>
-    </nav>
-    <p class="note">
-      © {year} Silfaradila Mei Fizahidah. {t(lang, 'footer.builtNote')}
-    </p>
   </div>
 </footer>
 
 <style>
   .site-footer {
-    border-top: 1px solid var(--border-subtle);
-    margin-top: var(--space-9);
+    min-height: 20rem;
+    background: var(--ink);
+    color: var(--canvas);
+    position: relative;
+    overflow: hidden;
   }
 
   .inner {
-    max-width: var(--container);
-    margin: 0 auto;
-    padding: var(--space-7) var(--container-pad);
+    min-height: inherit;
+    padding-block: var(--space-8);
     display: grid;
-    gap: var(--space-5);
+    gap: var(--space-8);
+    position: relative;
+    z-index: 1;
   }
 
-  .mark {
-    color: var(--text-high);
-    font-weight: 600;
+  .footer--expressive {
+    min-height: min(72svh, 46rem);
+  }
+  .footer--medium {
+    min-height: min(50svh, 34rem);
+  }
+  .footer--compact {
+    min-height: 18rem;
+  }
+  .footer--home {
+    min-height: 24rem;
+  }
+  .footer--home .inner {
+    padding-block: var(--space-7) var(--space-5);
+    gap: var(--space-6);
+  }
+  .footer--compact .inner {
+    align-content: space-between;
+    gap: var(--space-6);
   }
 
-  .tagline {
-    color: var(--text-muted);
-    font-size: var(--text-sm);
-    margin-top: var(--space-2);
-    max-width: 44ch;
+  .who {
+    display: grid;
+    grid-template-columns: minmax(0, 8fr) minmax(14rem, 4fr);
+    align-items: end;
+    gap: var(--grid-gap);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid color-mix(in srgb, var(--canvas) 22%, transparent);
+  }
+
+  .who h2 {
+    max-width: 15ch;
+    color: var(--canvas);
+    font-size: var(--text-3xl);
+  }
+
+  .footer-label {
+    margin-bottom: var(--space-4);
+    color: #b8c0c7;
+    font-size: var(--text-xs);
+  }
+  .who .btn {
+    justify-self: end;
+  }
+
+  .closing__links {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(18rem, 5fr);
+    gap: var(--grid-gap);
+    align-items: end;
+  }
+
+  .footer-mark {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    color: var(--canvas);
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    font-weight: 500;
+    line-height: 0.9;
+    letter-spacing: -0.055em;
+    text-decoration: none;
+  }
+
+  .directory {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
   }
 
   .links,
   .socials {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-4);
+    display: grid;
+    align-content: start;
   }
 
-  .links a {
-    color: var(--text-body);
-    text-decoration: none;
-    font-size: var(--text-sm);
-  }
-
-  .links a:hover {
-    color: var(--neon-magenta);
-  }
-
+  .links a,
   .socials a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    color: var(--canvas);
     font-size: var(--text-sm);
+    text-decoration-color: transparent;
+  }
+
+  .links a:hover,
+  .socials a:hover {
+    color: #aabfff;
+    text-decoration-color: currentColor;
   }
 
   .note {
-    color: var(--text-muted);
+    grid-column: 1 / -1;
+    color: #b8c0c7;
     font-size: var(--text-xs);
   }
 
-  @media (min-width: 768px) {
-    .inner {
-      grid-template-columns: 2fr 1fr 1fr;
-      align-items: start;
-    }
+  .footer-petals {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    .note {
-      grid-column: 1 / -1;
+  .home-contact {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid color-mix(in srgb, var(--canvas) 22%, transparent);
+  }
+
+  .home-contact h2 {
+    max-width: 20ch;
+    color: var(--canvas);
+    font-size: clamp(2rem, 3.6vw, 3.75rem);
+  }
+
+  .footer--home .footer-mark {
+    font-size: clamp(2rem, 4.5vw, 4rem);
+  }
+  .footer--home .closing__links {
+    grid-template-columns: minmax(0, 6fr) minmax(18rem, 6fr);
+  }
+
+  @media (max-width: 767px) {
+    .footer--expressive,
+    .footer--medium,
+    .footer--compact {
+      min-height: auto;
+    }
+    .footer--home {
+      min-height: auto;
+    }
+    .inner {
+      padding-block: var(--space-8);
+    }
+    .who {
+      grid-template-columns: 1fr;
+      padding-bottom: var(--space-7);
+    }
+    .who .btn {
+      justify-self: stretch;
+    }
+    .closing__links {
+      grid-template-columns: 1fr;
+    }
+    .footer--home .closing__links {
+      grid-template-columns: 1fr;
+      gap: var(--space-5);
+    }
+    .footer-mark {
+      font-size: clamp(3.25rem, 16vw, 5.5rem);
+    }
+    .home-contact {
+      align-items: stretch;
+      flex-direction: column;
+    }
+    .home-contact .btn {
+      width: 100%;
+    }
+    .footer--home .footer-mark {
+      font-size: clamp(2.5rem, 12vw, 4rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .footer-petals {
+      display: none;
     }
   }
 </style>

@@ -3,6 +3,7 @@
  * aria-expanded, Escape to close, focus returns to the toggle. Hidden above
  * 640px — the desktop nav in header.astro takes over there. */
 import { navItems, navPaths, t, type Lang } from '../i18n/ui';
+import { localizedPath } from '../i18n/utils';
 import { withBase } from '../lib/urls';
 
 interface Props {
@@ -10,18 +11,17 @@ interface Props {
 }
 
 const { lang = 'en' } = Astro.props;
+const hrefFor = (path: string) => withBase(localizedPath(path, lang));
 ---
 
 <div class="mobile-nav">
   <button type="button" class="toggle" aria-expanded="false" aria-controls="mobile-menu">
-    <span class="mono" aria-hidden="true">
-      ≡
-    </span>
+    <span class="toggle-lines" aria-hidden="true"><i></i><i></i></span>
     <span class="visually-hidden">Menu</span>
   </button>
   <nav id="mobile-menu" class="panel" hidden aria-label={t(lang, 'nav.home')}>
     {navItems.map((item) => (
-      <a href={withBase(navPaths[item])}>{t(lang, `nav.${item}` as const)}</a>
+      <a href={hrefFor(navPaths[item])}>{t(lang, `nav.${item}` as const)}</a>
     ))}
   </nav>
 </div>
@@ -64,47 +64,50 @@ const { lang = 'en' } = Astro.props;
     position: relative;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1023px) {
     .mobile-nav {
       display: block;
     }
   }
 
   .toggle {
-    color: var(--text-high);
-    font-size: var(--text-xl);
-    line-height: 1;
-    padding: var(--space-2);
+    width: 2.75rem;
+    height: 2.75rem;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
   }
 
-  .toggle:hover {
-    color: var(--neon-magenta);
-  }
+  .toggle:hover { border-color: var(--p-ink); }
+  .toggle-lines { width: 1rem; display: grid; gap: 0.28rem; }
+  .toggle-lines i { display: block; height: 1px; background: currentColor; }
 
   .panel {
-    position: absolute;
-    right: 0;
-    top: calc(100% + var(--space-2));
-    min-width: 12rem;
-    background: var(--surface-1);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    box-shadow: var(--glow-violet);
+    position: fixed;
+    inset: var(--nav-height) 0 0;
+    background: var(--canvas);
+    border-top: 1px solid var(--rule);
     display: grid;
-    padding: var(--space-2);
+    align-content: start;
+    padding: var(--space-6) var(--container-pad);
   }
 
   .panel a {
-    color: var(--text-body);
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    color: var(--ink);
     text-decoration: none;
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-sm);
-    font-size: var(--text-sm);
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--font-sans);
+    font-size: var(--text-2xl);
   }
 
   .panel a:hover {
-    color: var(--text-high);
-    background: var(--surface-2);
+      color: var(--blue);
   }
 
   .visually-hidden {

@@ -110,3 +110,10 @@ export function translatePath(
   const path = localized ?? '/';
   return target === defaultLang ? path : `/${target}${path === '/' ? '/' : path}`;
 }
+
+/** Apply a locale prefix to a known neutral route. */
+export function localizedPath(path: string, lang: Lang): string {
+  const normalized = normalizeTrailingSlash(path);
+  if (lang === defaultLang) return normalized;
+  return `/${lang}${normalized === '/' ? '/' : normalized}`;
+}

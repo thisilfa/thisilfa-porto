@@ -4,7 +4,7 @@ import astro from 'eslint-plugin-astro';
 
 export default [
   {
-    ignores: ['dist/**', '.astro/**', 'node_modules/**', 'public/**'],
+    ignores: ['dist/**', '.astro/**', '.taste-skill/**', 'node_modules/**', 'public/**'],
   },
   js.configs.recommended,
   ...astro.configs.recommended,

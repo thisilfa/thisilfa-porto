@@ -50,32 +50,41 @@ const entries = locales.map((locale) => {
   .switcher {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: 0;
     font-size: var(--text-xs);
-    letter-spacing: 0.08em;
+    letter-spacing: 0;
   }
 
   .switcher a {
-    color: var(--text-muted);
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-soft);
     text-decoration: none;
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-pill);
-    padding: 0.05rem var(--space-2);
+    border: 0;
+    border-bottom: 1px solid var(--border-subtle);
+    border-radius: 0;
+    padding: 0;
     transition:
       color var(--transition-fast),
       border-color var(--transition-fast);
   }
 
   .switcher a:hover {
-    color: var(--neon-magenta);
-    border-color: var(--border-strong);
+    color: var(--blue);
+    border-color: var(--blue);
   }
 
   .current {
-    color: var(--text-high);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-pill);
-    padding: 0.05rem var(--space-2);
-    background: var(--surface-2);
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    border-bottom: 2px solid var(--ink);
+    padding: 0;
   }
 </style>
